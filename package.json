@@ -1,0 +1,12 @@
+{
+  "name": "priximport-owendo",
+  "version": "1.0.0",
+  "description": "Site vitrine du supermarché Prix Import Owendo (Libreville, Gabon)",
+  "private": true,
+  "scripts": {
+    "start": "live-server --port=5500"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
