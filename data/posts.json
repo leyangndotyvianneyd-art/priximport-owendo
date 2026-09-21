@@ -1,0 +1,59 @@
+[
+  {
+    "id": "ventilateur",
+    "type": "video",
+    "title": "Ventilateur",
+    "caption": "Powerfull",
+    "tag": "Nouveau produit",
+    "date": "2026-09-12",
+    "media": "https://i.ytimg.com/vi/dloJL5KqzJs/oar2.jpg?sqp=-oaymwEoCJUDENAFSFqQAgHyq4qpAxcIARUAAIhC2AEB4gEKCBgQAhgGOAFAAQ==&rs=AOn4CLBpSNYAbe6nPho4T3-PZ6CkopGo1A&usqp=CCk",
+    "youtube": "https://youtube.com/shorts/dloJL5KqzJs?si=ByXS6AUinw0bFREn",
+    "thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNGtaVfHw0mY86MrpTiUO7vjmd9YRaI-N0OLqbBXvDvw&s=10"
+  },
+  {
+    "id": "fromage",
+    "type": "photo",
+    "title": "Fromage",
+    "caption": "petit tour au frigo gourmandises",
+    "tag": "Nouveau produit",
+    "date": "2026-09-12",
+    "media": "https://martinique.123-click.com/pub/produits/catalogue/frais/yaourts_desserts/.2501558-1_m.jpg"
+  },
+  {
+    "id": "p1",
+    "type": "photo",
+    "title": "Arrivage de tomates fraîches",
+    "caption": "Récoltées ce matin chez nos producteurs d'Owendo.",
+    "tag": "Fraîcheur locale",
+    "date": "2026-08-21",
+    "media": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=800"
+  },
+  {
+    "id": "p2",
+    "type": "video",
+    "title": "Petit tour du rayon épicerie",
+    "caption": "Nos prix bas expliqués en une minute, en vidéo.",
+    "tag": "Coulisses",
+    "date": "2026-08-18",
+    "youtube": "aqz-KE-bpKQ",
+    "thumbnail": "https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=800"
+  },
+  {
+    "id": "p3",
+    "type": "photo",
+    "title": "Nouveau : huile 5L en promo",
+    "caption": "8 900 FCFA le bidon, disponible cette semaine.",
+    "tag": "Nouveau produit",
+    "date": "2026-08-15",
+    "media": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=800"
+  },
+  {
+    "id": "p4",
+    "type": "photo",
+    "title": "Riz 25kg, stock réapprovisionné",
+    "caption": "Le sac est de retour en rayon, prix inchangé.",
+    "tag": "Réassort",
+    "date": "2026-08-10",
+    "media": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=800"
+  }
+]

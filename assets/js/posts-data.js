@@ -1,10 +1,15 @@
 // posts-data.js
-// Ajoute ou modifie tes publications ici — c'est le SEUL fichier à toucher
-// pour publier une nouvelle photo ou vidéo.
+// ⚠️ FICHIER OBSOLÈTE — plus utilisé par le site depuis l'ajout de la page
+// d'administration (pages/admin.html). Les publications se gèrent
+// maintenant dans data/posts.json (à la main, ou via l'admin — voir
+// README.md, section "Administration du catalogue et des Nouveautés").
+// Ce fichier n'est plus chargé par aucune page ; gardé pour référence.
 //
 // type: "photo" ou "video"
 // Pour une vidéo YouTube  → renseigne "youtube": "ID_VIDEO" + "thumbnail"
 // Pour une vidéo maison   → renseigne "video": "assets/videos/fichier.mp4" + "thumbnail"
+// "media"/"thumbnail" peuvent être un chemin local (assets/img/posts/...)
+// ou une URL complète (https://...) le temps d'avoir de vraies photos.
 
 window.POSTS = [
   {
@@ -14,7 +19,7 @@ window.POSTS = [
     caption: "Récoltées ce matin chez nos producteurs d'Owendo.",
     tag: "Fraîcheur locale",
     date: "2026-08-21",
-    media: "assets/img/posts/tomates.jpg"
+    media: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=800"
   },
   {
     id: "p2",
@@ -23,8 +28,12 @@ window.POSTS = [
     caption: "Nos prix bas expliqués en une minute, en vidéo.",
     tag: "Coulisses",
     date: "2026-08-18",
-    youtube: "REMPLACE_PAR_ID_YOUTUBE",
-    thumbnail: "assets/img/posts/rayon-epicerie.jpg"
+    // Vidéo de TEST (Big Buck Bunny, Blender Foundation, libre de droits) —
+    // juste pour vérifier que le lecteur fonctionne. Remplace "aqz-KE-bpKQ"
+    // par l'ID de ta vraie vidéo YouTube dès que tu l'as (l'ID est la partie
+    // après "v=" dans l'URL YouTube, ex: youtube.com/watch?v=CET_ID_ICI).
+    youtube: "aqz-KE-bpKQ",
+    thumbnail: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=800"
   },
   {
     id: "p3",
@@ -33,7 +42,7 @@ window.POSTS = [
     caption: "8 900 FCFA le bidon, disponible cette semaine.",
     tag: "Nouveau produit",
     date: "2026-08-15",
-    media: "assets/img/posts/huile-5l.jpg"
+    media: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=800"
   },
   {
     id: "p4",
@@ -42,6 +51,6 @@ window.POSTS = [
     caption: "Le sac est de retour en rayon, prix inchangé.",
     tag: "Réassort",
     date: "2026-08-10",
-    media: "assets/img/posts/riz-25kg.jpg"
+    media: "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=800"
   }
 ];

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — PRIX IMPORT OWENDO</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="../index.html" class="logo" aria-label="PRIX IMPORT OWENDO, accueil">
+      <svg class="logo-mark" viewBox="0 0 48 48" fill="none">
+        <rect x="2" y="2" width="44" height="44" rx="10" fill="#1B4332"/>
+        <path d="M14 18h20l-2.4 14.4a2 2 0 0 1-2 1.6H18.4a2 2 0 0 1-2-1.6L14 18Z" stroke="#F4C430" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M17 18v-2a7 7 0 0 1 14 0v2" stroke="#F4C430" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="20" cy="24" r="1.6" fill="#E8871E"/>
+        <circle cx="28" cy="24" r="1.6" fill="#E8871E"/>
+      </svg>
+      <span class="logo-text">
+        <span class="l1">Prix Import</span>
+        <span class="l2">— Owendo —</span>
+      </span>
+    </a>
+    <ul class="nav-links">
+      <li><span style="color:var(--gray); font-weight:600;">Administration</span></li>
+    </ul>
+    <div id="adminTopbarActions"></div>
+  </nav>
+</header>
+
+<main>
+  <section class="section">
+    <div class="wrap">
+
+      <div id="adminLogin" class="admin-login" hidden>
+        <div class="admin-login-card">
+          <h1>Connexion administrateur</h1>
+          <p class="admin-hint">Réservé au gérant du magasin. Le compte se crée avec <code>npm run create-admin</code> (voir le README).</p>
+          <form id="adminLoginForm">
+            <label>Email
+              <input type="email" name="email" required autocomplete="username">
+            </label>
+            <label>Mot de passe
+              <input type="password" name="password" required autocomplete="current-password">
+            </label>
+            <p class="admin-error" id="adminLoginError" hidden></p>
+            <button type="submit" class="btn btn-primary">Se connecter</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="adminDashboard" hidden>
+        <div class="admin-tabs">
+          <button type="button" class="admin-tab active" data-tab="products">Produits</button>
+          <button type="button" class="admin-tab" data-tab="posts">Nouveautés</button>
+          <button type="button" class="admin-tab" data-tab="content">Contenu du site</button>
+        </div>
+
+        <div class="admin-panel" data-panel="products">
+          <div class="admin-panel-head">
+            <h2>Catalogue produits</h2>
+            <button type="button" class="btn btn-primary" id="btnNewProduct">+ Ajouter un produit</button>
+          </div>
+          <p class="admin-hint">Toute modification ici apparaît immédiatement sur le site web et dans l'application mobile.</p>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Produit</th>
+                  <th>Catégorie</th>
+                  <th>Prix</th>
+                  <th>Actif</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-panel" data-panel="posts" hidden>
+          <div class="admin-panel-head">
+            <h2>Publications Nouveautés</h2>
+            <button type="button" class="btn btn-primary" id="btnNewPost">+ Ajouter une publication</button>
+          </div>
+          <p class="admin-hint">Photos et vidéos affichées sur la page "Nouveautés" du site et de l'application.</p>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="postsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-panel" data-panel="content" hidden>
+          <div class="admin-panel-head">
+            <h2>Textes généraux</h2>
+          </div>
+          <p class="admin-hint">Bandeau du haut, pied de page, adresse, téléphone, email, WhatsApp — affichés sur toutes les pages du site.</p>
+          <form id="fieldsForm">
+            <div class="admin-form-row">
+              <label>Message du bandeau (haut de page)
+                <input type="text" name="topbarMessage">
+              </label>
+              <label>Point fort du bandeau (en gras)
+                <input type="text" name="topbarHighlight">
+              </label>
+            </div>
+            <label>Texte de présentation (pied de page)
+              <textarea name="footerTagline" rows="2"></textarea>
+            </label>
+            <div class="admin-form-row">
+              <label>Adresse
+                <input type="text" name="address">
+              </label>
+              <label>Téléphone
+                <input type="text" name="phone">
+              </label>
+            </div>
+            <div class="admin-form-row">
+              <label>Email
+                <input type="email" name="email">
+              </label>
+              <label>Numéro WhatsApp (sans le +, ex. 24107413215)
+                <input type="text" name="whatsapp">
+              </label>
+            </div>
+            <label>Légende sur la carte (page Localisation)
+              <input type="text" name="mapCaption">
+            </label>
+            <label>Note d'engagement (page Fraîcheur & Local, après « Notre engagement : »)
+              <textarea name="freshNote" rows="2"></textarea>
+            </label>
+            <p class="admin-error" id="fieldsFormError" hidden></p>
+            <div class="admin-form-actions">
+              <button type="submit" class="btn btn-primary">Enregistrer les textes</button>
+            </div>
+          </form>
+
+          <div class="admin-panel-head" style="margin-top:36px;">
+            <h2>Horaires d'ouverture</h2>
+            <button type="button" class="btn btn-primary" id="btnNewHours">+ Ajouter une ligne</button>
+          </div>
+          <p class="admin-hint">Affichés sur les pages Localisation et Contact.</p>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Jours</th><th>Horaire</th><th></th></tr></thead>
+              <tbody id="hoursTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="admin-panel-head" style="margin-top:36px;">
+            <h2>Cartes de la page d'accueil</h2>
+            <button type="button" class="btn btn-primary" data-new-card="home">+ Ajouter une carte</button>
+          </div>
+          <p class="admin-hint">Les 4 cartes "Ce que propose le magasin" sur la page d'accueil.</p>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Carte</th><th>Lien</th><th></th></tr></thead>
+              <tbody id="cardsTableBody-home"></tbody>
+            </table>
+          </div>
+
+          <div class="admin-panel-head" style="margin-top:36px;">
+            <h2>Cartes « Fraîcheur & Local »</h2>
+            <button type="button" class="btn btn-primary" data-new-card="fraicheur">+ Ajouter une carte</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Carte</th><th></th></tr></thead>
+              <tbody id="cardsTableBody-fraicheur"></tbody>
+            </table>
+          </div>
+
+          <div class="admin-panel-head" style="margin-top:36px;">
+            <h2>Cartes « Services »</h2>
+            <button type="button" class="btn btn-primary" data-new-card="services">+ Ajouter une carte</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Carte</th><th></th></tr></thead>
+              <tbody id="cardsTableBody-services"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- Formulaire produit (ajout / édition) -->
+<div class="admin-modal" id="productModal" hidden>
+  <div class="admin-modal-card">
+    <h3 id="productModalTitle">Ajouter un produit</h3>
+    <form id="productForm">
+      <input type="hidden" name="id">
+      <label>Nom du produit *
+        <input type="text" name="name" required>
+      </label>
+      <div class="admin-form-row">
+        <label>Unité (ex. Paquet 1kg)
+          <input type="text" name="unit">
+        </label>
+        <label>Catégorie *
+          <input type="text" name="category" required list="categoryList">
+          <datalist id="categoryList"></datalist>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>Prix (FCFA) *
+          <input type="number" name="price" min="0" required>
+        </label>
+        <label>Ancien prix (optionnel, pour une promo)
+          <input type="number" name="oldPrice" min="0">
+        </label>
+      </div>
+      <label>Image (URL, ou nom de fichier dans assets/img/products/)
+        <input type="text" name="image">
+      </label>
+      <div class="admin-form-row admin-form-checkboxes">
+        <label class="admin-checkbox"><input type="checkbox" name="promo" id="productPromoCheckbox"> En promotion</label>
+        <label class="admin-checkbox"><input type="checkbox" name="active" checked> Actif (visible sur le site)</label>
+      </div>
+      <div id="productPromoDates" hidden>
+        <div class="admin-form-row">
+          <label>Début de la promotion *
+            <input type="date" name="promoStart">
+          </label>
+          <label>Fin de la promotion *
+            <input type="date" name="promoEnd">
+          </label>
+        </div>
+        <p class="admin-hint">En dehors de cette période, le badge "Promo" et l'ancien prix barré ne s'afficheront plus automatiquement sur le site — pas besoin d'y repenser après coup.</p>
+      </div>
+      <p class="admin-error" id="productFormError" hidden></p>
+      <div class="admin-form-actions">
+        <button type="button" class="btn btn-outline" id="btnCancelProduct">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Formulaire publication (ajout / édition) -->
+<div class="admin-modal" id="postModal" hidden>
+  <div class="admin-modal-card">
+    <h3 id="postModalTitle">Ajouter une publication</h3>
+    <form id="postForm">
+      <input type="hidden" name="id">
+      <label>Titre *
+        <input type="text" name="title" required>
+      </label>
+      <label>Description
+        <textarea name="caption" rows="2"></textarea>
+      </label>
+      <div class="admin-form-row">
+        <label>Type *
+          <select name="type" id="postTypeSelect">
+            <option value="photo">Photo</option>
+            <option value="video">Vidéo</option>
+          </select>
+        </label>
+        <label>Étiquette (ex. "Nouveau produit")
+          <input type="text" name="tag">
+        </label>
+      </div>
+      <label>Date
+        <input type="date" name="date">
+      </label>
+      <div id="postPhotoFields">
+        <label>Image (URL)
+          <input type="text" name="media">
+        </label>
+      </div>
+      <div id="postVideoFields" hidden>
+        <p class="admin-hint">Deux façons d'ajouter une vidéo — remplis seulement l'une des deux ci-dessous :</p>
+        <label>Option 1 : ID de la vidéo YouTube (partie après "v=" dans l'URL)
+          <input type="text" name="youtube" placeholder="ex. dQw4w9WgXcQ">
+        </label>
+        <label>Option 2 : lien direct vers un fichier vidéo (.mp4)
+          <input type="text" name="videoUrl" placeholder="https://... .mp4, ou un fichier dans assets/videos/">
+        </label>
+        <label>Miniature (URL d'une image, affichée avant lecture)
+          <input type="text" name="thumbnail">
+        </label>
+      </div>
+      <p class="admin-error" id="postFormError" hidden></p>
+      <div class="admin-form-actions">
+        <button type="button" class="btn btn-outline" id="btnCancelPost">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Formulaire ligne d'horaires (ajout / édition) -->
+<div class="admin-modal" id="hoursModal" hidden>
+  <div class="admin-modal-card">
+    <h3 id="hoursModalTitle">Ajouter une ligne d'horaires</h3>
+    <form id="hoursForm">
+      <input type="hidden" name="id">
+      <label>Jours *
+        <input type="text" name="label" required placeholder="ex. Lundi — Samedi">
+      </label>
+      <label>Horaire *
+        <input type="text" name="value" required placeholder="ex. 07h00 – 19h30, ou Fermé">
+      </label>
+      <p class="admin-error" id="hoursFormError" hidden></p>
+      <div class="admin-form-actions">
+        <button type="button" class="btn btn-outline" id="btnCancelHours">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Formulaire carte (ajout / édition) — réutilisé pour Accueil / Fraîcheur / Services -->
+<div class="admin-modal" id="cardModal" hidden>
+  <div class="admin-modal-card">
+    <h3 id="cardModalTitle">Ajouter une carte</h3>
+    <form id="cardForm">
+      <input type="hidden" name="id">
+      <input type="hidden" name="section">
+      <label>Titre *
+        <input type="text" name="title" required>
+      </label>
+      <label>Texte
+        <textarea name="text" rows="2"></textarea>
+      </label>
+      <label>Icône *
+        <select name="icon" id="cardIconSelect" required></select>
+      </label>
+      <div id="cardHrefField">
+        <label>Lien (page vers laquelle cette carte renvoie)
+          <select name="href">
+            <option value="pages/catalogue.html">Catalogue</option>
+            <option value="pages/fraicheur.html">Fraîcheur & Local</option>
+            <option value="pages/nouveautes.html">Nouveautés</option>
+            <option value="pages/services.html">Services</option>
+            <option value="pages/localisation.html">Localisation</option>
+          </select>
+        </label>
+      </div>
+      <p class="admin-error" id="cardFormError" hidden></p>
+      <div class="admin-form-actions">
+        <button type="button" class="btn btn-outline" id="btnCancelCard">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>window.DATA_BASE = "../";</script>
+<script src="../assets/js/site-content.js"></script>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>

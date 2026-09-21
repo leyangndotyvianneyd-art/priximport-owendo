@@ -1,0 +1,608 @@
+[
+  {
+    "reference": "PIO-MTW6P9BJ",
+    "date": "2026-09-10T23:54:31.663Z",
+    "customer": {
+      "name": "leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "livraison",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 47400
+  },
+  {
+    "reference": "PIO-MTX9F871",
+    "date": "2026-09-11T17:58:28.670Z",
+    "customer": {
+      "name": "leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "plantain-regime",
+        "name": "Régime de plantains",
+        "price": 3500,
+        "unit": "Régime",
+        "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "jus-fruits-1l",
+        "name": "Jus de fruits",
+        "price": 1500,
+        "unit": "Bouteille 1L",
+        "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "legumes-panier",
+        "name": "Panier de légumes locaux",
+        "price": 2000,
+        "unit": "Panier",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 7750
+  },
+  {
+    "reference": "PIO-MTX9GSAF",
+    "date": "2026-09-11T17:59:41.367Z",
+    "customer": {
+      "name": "Sagesse dream",
+      "phone": "077143139",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 48150
+  },
+  {
+    "reference": "PIO-MTX9KUMF",
+    "date": "2026-09-11T18:02:51.015Z",
+    "customer": {
+      "name": "Daveney Leyang",
+      "phone": "077143139",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "plantain-regime",
+        "name": "Régime de plantains",
+        "price": 3500,
+        "unit": "Régime",
+        "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 19650
+  },
+  {
+    "reference": "PIO-MTX9N71Z",
+    "date": "2026-09-11T18:04:40.439Z",
+    "customer": {
+      "name": "Michael",
+      "phone": "077143139",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 48150
+  },
+  {
+    "reference": "PIO-MTXOEWVK",
+    "date": "2026-09-12T00:58:08.240Z",
+    "customer": {
+      "name": "leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 48150
+  },
+  {
+    "reference": "PIO-MTXPT0MW",
+    "date": "2026-09-12T01:37:05.912Z",
+    "customer": {
+      "name": "leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 48150
+  },
+  {
+    "reference": "PIO-MTXPUDWO",
+    "date": "2026-09-12T01:38:09.768Z",
+    "customer": {
+      "name": "leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine de blé",
+        "price": 750,
+        "unit": "Paquet 1kg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "lait-poudre-900g",
+        "name": "Lait en poudre",
+        "price": 4200,
+        "unit": "Boîte 900g",
+        "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "eau-minerale-pack6",
+        "name": "Eau minérale",
+        "price": 1800,
+        "unit": "Pack de 6 x 1.5L",
+        "image": "https://images.unsplash.com/photo-1560023907-5f339617ea30?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "jus-fruits-1l",
+        "name": "Jus de fruits",
+        "price": 1500,
+        "unit": "Bouteille 1L",
+        "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "plantain-regime",
+        "name": "Régime de plantains",
+        "price": 3500,
+        "unit": "Régime",
+        "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "poisson-frais-kg",
+        "name": "Poisson frais du port",
+        "price": 2500,
+        "unit": "Kg",
+        "image": "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "legumes-panier",
+        "name": "Panier de légumes locaux",
+        "price": 2000,
+        "unit": "Panier",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "savon-lessive",
+        "name": "Savon de lessive",
+        "price": 600,
+        "unit": "Pain",
+        "image": "https://images.unsplash.com/photo-1585421514738-01798e348b17?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "couches-bebe-paquet",
+        "name": "Couches bébé",
+        "price": 5500,
+        "unit": "Paquet",
+        "image": "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 69750
+  },
+  {
+    "reference": "PIO-MU7GJ7WT",
+    "date": "2026-09-18T21:15:13.997Z",
+    "customer": {
+      "name": "Test Utilisateur",
+      "phone": "074123456",
+      "mode": "retrait",
+      "address": ""
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 32000
+  },
+  {
+    "reference": "PIO-MU7HFMJF",
+    "date": "2026-09-18T21:40:25.947Z",
+    "customer": {
+      "name": "Verif Prix Sheet",
+      "phone": "070000000",
+      "mode": "retrait"
+    },
+    "items": [
+      {
+        "id": "test-prix",
+        "name": "Test Prix Article",
+        "price": 1234,
+        "qty": 2
+      }
+    ],
+    "total": 2468
+  },
+  {
+    "reference": "PIO-MU7HLC5C",
+    "date": "2026-09-18T21:44:52.416Z",
+    "customer": {
+      "name": "leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "retrait",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "fromage",
+        "name": "Fromage",
+        "price": 1500,
+        "unit": "1kg",
+        "image": "https://youtube.com/shorts/kN7cFcn9dO0?si=K6o4OyADjPS56L2S",
+        "qty": 1
+      },
+      {
+        "id": "poisson-frais-kg",
+        "name": "Poisson frais du port",
+        "price": 2500,
+        "unit": "Kg",
+        "image": "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "legumes-panier",
+        "name": "Panier de légumes locaux",
+        "price": 2000,
+        "unit": "Panier",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "savon-lessive",
+        "name": "Savon de lessive",
+        "price": 600,
+        "unit": "Pain",
+        "image": "https://images.unsplash.com/photo-1585421514738-01798e348b17?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "couches-bebe-paquet",
+        "name": "Couches bébé",
+        "price": 5500,
+        "unit": "Paquet",
+        "image": "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 12100
+  },
+  {
+    "reference": "PIO-MU88GYNP",
+    "date": "2026-09-19T10:17:17.943Z",
+    "customer": {
+      "name": "Vianney",
+      "phone": "074132215",
+      "mode": "livraison",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 32000,
+        "unit": "Sac de 25kg",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600",
+        "qty": 1
+      }
+    ],
+    "total": 38500
+  },
+  {
+    "reference": "PIO-MUBKLKVC",
+    "date": "2026-09-21T18:20:07.275Z",
+    "customer": {
+      "name": "Vianney",
+      "phone": "074132215",
+      "mode": "livraison",
+      "address": "Owendo_Sni"
+    },
+    "items": [
+      {
+        "id": "riz-basmati-25kg",
+        "name": "Riz Basmati (sac 25kg)",
+        "price": 18000,
+        "unit": "Sac de 25kg",
+        "image": "https://i0.wp.com/directinfosgabon.com/wp-content/uploads/2019/03/riz-jasmin.jpg?resize=640%2C380&ssl=1",
+        "qty": 1
+      },
+      {
+        "id": "riz-parfume-5kg",
+        "name": "Riz parfumé",
+        "price": 6500,
+        "unit": "Sac de 5kg",
+        "image": "https://images.coinafrique.com/5370914_uploaded_image1_1749723957.jpg",
+        "qty": 1
+      },
+      {
+        "id": "huile-vegetale-5l",
+        "name": "Huile végétale",
+        "price": 8900,
+        "unit": "Bidon 5L",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYGjtzJY_NzVlri2AGIyB-tKHLKHUIwaK1uEHKwQZ_UA&s=10",
+        "qty": 1
+      },
+      {
+        "id": "farine-ble-1kg",
+        "name": "Farine",
+        "price": 1000,
+        "unit": "Paquet 1kg",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpKG8NWEOPgIJN2kKWTNAW3hPwPNxpgPtPoyafNuPdYA&s=10",
+        "qty": 1
+      },
+      {
+        "id": "lait-poudre-900g",
+        "name": "Lait en poudre",
+        "price": 4200,
+        "unit": "Boîte 900g",
+        "image": "https://s.rfi.fr/media/display/4d37dbe0-127f-11ea-a592-005056a99247/w:1280/p:3x4/lait-en-poudre_1_0.jpg",
+        "qty": 1
+      },
+      {
+        "id": "jus-fruits-1l",
+        "name": "Jus de fruits",
+        "price": 1500,
+        "unit": "Bouteille 1L",
+        "image": "https://thumbs.dreamstime.com/b/jus-de-fruit-assortis-dans-le-supermarch%C3%A9-gastronome-78042483.jpg",
+        "qty": 1
+      },
+      {
+        "id": "plantain-regime",
+        "name": "Banane douce",
+        "price": 1200,
+        "unit": "1kg",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnnWWTzD9yRZ_VV744W_H18D0ulQK78O4bjFwPsBa-0_48xIjcnrLN2AE&s=10",
+        "qty": 1
+      }
+    ],
+    "total": 41300
+  }
+]

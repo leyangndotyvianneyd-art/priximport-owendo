@@ -1,0 +1,594 @@
+// admin.js — Page d'administration (pages/admin.html)
+// Gère la connexion, puis l'ajout/modification/suppression des produits
+// et des publications Nouveautés. Toute modification enregistrée ici passe
+// par /api/admin/* (protégé par session) et se répercute immédiatement sur
+// le site (assets/js/products.js, posts.js) et sur l'appli mobile Flutter,
+// puisque tous les deux lisent /api/products et /api/posts en direct.
+
+(function () {
+  const loginView = document.getElementById('adminLogin');
+  const dashboardView = document.getElementById('adminDashboard');
+  const topbarActions = document.getElementById('adminTopbarActions');
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  async function api(url, options) {
+    const res = await fetch(url, {
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      ...options
+    });
+    let body = {};
+    try { body = await res.json(); } catch (e) { /* réponse vide */ }
+    if (!res.ok) {
+      const err = new Error(body.error || 'Erreur serveur.');
+      err.status = res.status;
+      throw err;
+    }
+    return body;
+  }
+
+  function renderTopbar(email) {
+    topbarActions.innerHTML = '';
+    const span = document.createElement('span');
+    span.style.color = 'var(--gray)';
+    span.style.fontSize = '0.85rem';
+    span.style.marginRight = '12px';
+    span.textContent = email;
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline';
+    btn.type = 'button';
+    btn.textContent = 'Se déconnecter';
+    btn.addEventListener('click', async () => {
+      await api('/api/admin/logout', { method: 'POST' });
+      location.reload();
+    });
+    topbarActions.appendChild(span);
+    topbarActions.appendChild(btn);
+  }
+
+  // ---------------- Connexion ----------------
+
+  const loginForm = document.getElementById('adminLoginForm');
+  const loginError = document.getElementById('adminLoginError');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.hidden = true;
+    const data = Object.fromEntries(new FormData(loginForm));
+    try {
+      const result = await api('/api/admin/login', { method: 'POST', body: JSON.stringify(data) });
+      renderTopbar(result.email);
+      loginView.hidden = true;
+      dashboardView.hidden = false;
+      loadAll();
+    } catch (err) {
+      loginError.textContent = err.message;
+      loginError.hidden = false;
+    }
+  });
+
+  async function checkSession() {
+    try {
+      const me = await api('/api/admin/me');
+      renderTopbar(me.email);
+      loginView.hidden = true;
+      dashboardView.hidden = false;
+      loadAll();
+    } catch (err) {
+      loginView.hidden = false;
+      dashboardView.hidden = true;
+    }
+  }
+
+  // ---------------- Onglets ----------------
+
+  document.querySelectorAll('.admin-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.admin-tab').forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.tab;
+      document.querySelectorAll('.admin-panel').forEach((panel) => {
+        panel.hidden = panel.dataset.panel !== target;
+      });
+    });
+  });
+
+  // ---------------- Produits ----------------
+
+  const productsTableBody = document.getElementById('productsTableBody');
+  const productModal = document.getElementById('productModal');
+  const productForm = document.getElementById('productForm');
+  const productFormError = document.getElementById('productFormError');
+  const productModalTitle = document.getElementById('productModalTitle');
+  const productPromoCheckbox = document.getElementById('productPromoCheckbox');
+  const productPromoDates = document.getElementById('productPromoDates');
+  let knownCategories = [];
+
+  function togglePromoDates() {
+    productPromoDates.hidden = !productPromoCheckbox.checked;
+  }
+  productPromoCheckbox.addEventListener('change', togglePromoDates);
+
+  function openProductModal(product) {
+    productForm.reset();
+    productFormError.hidden = true;
+    if (product) {
+      productModalTitle.textContent = 'Modifier « ' + product.name + ' »';
+      productForm.elements.id.value = product.id;
+      productForm.elements.name.value = product.name;
+      productForm.elements.unit.value = product.unit || '';
+      productForm.elements.category.value = product.category || '';
+      productForm.elements.price.value = product.price;
+      productForm.elements.oldPrice.value = product.oldPrice || '';
+      productForm.elements.image.value = product.image || '';
+      productForm.elements.promo.checked = !!product.promo;
+      productForm.elements.promoStart.value = product.promoStart || '';
+      productForm.elements.promoEnd.value = product.promoEnd || '';
+      productForm.elements.active.checked = product.active !== false;
+    } else {
+      productModalTitle.textContent = 'Ajouter un produit';
+      productForm.elements.id.value = '';
+      productForm.elements.active.checked = true;
+    }
+    togglePromoDates();
+    const categoryList = document.getElementById('categoryList');
+    categoryList.innerHTML = knownCategories.map((c) => `<option value="${escapeHtml(c)}">`).join('');
+    productModal.hidden = false;
+  }
+
+  document.getElementById('btnNewProduct').addEventListener('click', () => openProductModal(null));
+  document.getElementById('btnCancelProduct').addEventListener('click', () => { productModal.hidden = true; });
+
+  productForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    productFormError.hidden = true;
+    const raw = Object.fromEntries(new FormData(productForm));
+    const isPromo = productForm.elements.promo.checked;
+    if (isPromo && (!raw.promoStart || !raw.promoEnd)) {
+      productFormError.textContent = 'Renseigne une date de début et une date de fin pour la promotion.';
+      productFormError.hidden = false;
+      return;
+    }
+    if (isPromo && raw.promoStart && raw.promoEnd && raw.promoStart > raw.promoEnd) {
+      productFormError.textContent = 'La date de fin doit être après la date de début.';
+      productFormError.hidden = false;
+      return;
+    }
+    const payload = {
+      name: raw.name,
+      unit: raw.unit,
+      category: raw.category,
+      price: Number(raw.price),
+      oldPrice: raw.oldPrice ? Number(raw.oldPrice) : '',
+      image: raw.image,
+      promo: isPromo,
+      promoStart: isPromo ? raw.promoStart : '',
+      promoEnd: isPromo ? raw.promoEnd : '',
+      active: productForm.elements.active.checked
+    };
+    try {
+      if (raw.id) {
+        await api('/api/admin/products/' + encodeURIComponent(raw.id), { method: 'PUT', body: JSON.stringify(payload) });
+        showToast('Produit mis à jour.');
+      } else {
+        await api('/api/admin/products', { method: 'POST', body: JSON.stringify(payload) });
+        showToast('Produit ajouté.');
+      }
+      productModal.hidden = true;
+      loadProducts();
+    } catch (err) {
+      productFormError.textContent = err.message;
+      productFormError.hidden = false;
+    }
+  });
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function formatFcfa(value) {
+    return Number(value || 0).toLocaleString('fr-FR') + ' FCFA';
+  }
+
+  async function loadProducts() {
+    const products = await api('/api/products');
+    knownCategories = [...new Set(products.map((p) => p.category).filter(Boolean))];
+    productsTableBody.innerHTML = products.map((p) => `
+      <tr>
+        <td>
+          <strong>${escapeHtml(p.name)}</strong><br>
+          <span class="admin-muted">${escapeHtml(p.unit || '')}</span>
+        </td>
+        <td>${escapeHtml(p.category || '')}</td>
+        <td>${formatFcfa(p.price)}${p.oldPrice ? ` <span class="admin-muted" style="text-decoration:line-through;">${formatFcfa(p.oldPrice)}</span>` : ''}</td>
+        <td>${p.active === false ? '<span class="admin-badge admin-badge-off">Masqué</span>' : '<span class="admin-badge admin-badge-on">Visible</span>'}</td>
+        <td class="admin-row-actions">
+          <button type="button" class="btn btn-outline btn-sm" data-edit-product="${escapeHtml(p.id)}">Modifier</button>
+          <button type="button" class="btn btn-outline btn-sm admin-btn-danger" data-delete-product="${escapeHtml(p.id)}">Supprimer</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" class="admin-muted">Aucun produit pour le moment.</td></tr>';
+
+    productsTableBody.querySelectorAll('[data-edit-product]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const product = products.find((p) => p.id === btn.dataset.editProduct);
+        openProductModal(product);
+      });
+    });
+    productsTableBody.querySelectorAll('[data-delete-product]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const product = products.find((p) => p.id === btn.dataset.deleteProduct);
+        if (!confirm(`Supprimer « ${product.name} » du catalogue ?`)) return;
+        try {
+          await api('/api/admin/products/' + encodeURIComponent(product.id), { method: 'DELETE' });
+          showToast('Produit supprimé.');
+          loadProducts();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  }
+
+  // ---------------- Publications (Nouveautés) ----------------
+
+  const postsTableBody = document.getElementById('postsTableBody');
+  const postModal = document.getElementById('postModal');
+  const postForm = document.getElementById('postForm');
+  const postFormError = document.getElementById('postFormError');
+  const postModalTitle = document.getElementById('postModalTitle');
+  const postTypeSelect = document.getElementById('postTypeSelect');
+  const postPhotoFields = document.getElementById('postPhotoFields');
+  const postVideoFields = document.getElementById('postVideoFields');
+
+  function togglePostTypeFields() {
+    const isVideo = postTypeSelect.value === 'video';
+    postPhotoFields.hidden = isVideo;
+    postVideoFields.hidden = !isVideo;
+  }
+  postTypeSelect.addEventListener('change', togglePostTypeFields);
+
+  function openPostModal(post) {
+    postForm.reset();
+    postFormError.hidden = true;
+    if (post) {
+      postModalTitle.textContent = 'Modifier « ' + post.title + ' »';
+      postForm.elements.id.value = post.id;
+      postForm.elements.title.value = post.title;
+      postForm.elements.caption.value = post.caption || '';
+      postForm.elements.type.value = post.type;
+      postForm.elements.tag.value = post.tag || '';
+      postForm.elements.date.value = post.date || '';
+      postForm.elements.media.value = post.type !== 'video' ? (post.media || '') : '';
+      postForm.elements.videoUrl.value = post.type === 'video' ? (post.media || '') : '';
+      postForm.elements.youtube.value = post.youtube || '';
+      postForm.elements.thumbnail.value = post.thumbnail || '';
+    } else {
+      postModalTitle.textContent = 'Ajouter une publication';
+      postForm.elements.id.value = '';
+      postForm.elements.date.value = new Date().toISOString().slice(0, 10);
+    }
+    togglePostTypeFields();
+    postModal.hidden = false;
+  }
+
+  document.getElementById('btnNewPost').addEventListener('click', () => openPostModal(null));
+  document.getElementById('btnCancelPost').addEventListener('click', () => { postModal.hidden = true; });
+
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    postFormError.hidden = true;
+    const raw = Object.fromEntries(new FormData(postForm));
+    if (raw.type === 'video' && !raw.youtube && !raw.videoUrl) {
+      postFormError.textContent = 'Renseigne soit un ID YouTube, soit un lien vidéo direct.';
+      postFormError.hidden = false;
+      return;
+    }
+    const payload = {
+      title: raw.title,
+      caption: raw.caption,
+      type: raw.type,
+      tag: raw.tag,
+      date: raw.date,
+      media: raw.type === 'photo' ? raw.media : raw.videoUrl,
+      youtube: raw.type === 'video' ? raw.youtube : '',
+      thumbnail: raw.type === 'video' ? raw.thumbnail : ''
+    };
+    try {
+      if (raw.id) {
+        await api('/api/admin/posts/' + encodeURIComponent(raw.id), { method: 'PUT', body: JSON.stringify(payload) });
+        showToast('Publication mise à jour.');
+      } else {
+        await api('/api/admin/posts', { method: 'POST', body: JSON.stringify(payload) });
+        showToast('Publication ajoutée.');
+      }
+      postModal.hidden = true;
+      loadPosts();
+    } catch (err) {
+      postFormError.textContent = err.message;
+      postFormError.hidden = false;
+    }
+  });
+
+  async function loadPosts() {
+    const posts = await api('/api/posts');
+    postsTableBody.innerHTML = posts.map((p) => `
+      <tr>
+        <td><strong>${escapeHtml(p.title)}</strong><br><span class="admin-muted">${escapeHtml(p.tag || '')}</span></td>
+        <td>${p.type === 'video' ? '🎬 Vidéo' : '📷 Photo'}</td>
+        <td>${escapeHtml(p.date || '')}</td>
+        <td class="admin-row-actions">
+          <button type="button" class="btn btn-outline btn-sm" data-edit-post="${escapeHtml(p.id)}">Modifier</button>
+          <button type="button" class="btn btn-outline btn-sm admin-btn-danger" data-delete-post="${escapeHtml(p.id)}">Supprimer</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" class="admin-muted">Aucune publication pour le moment.</td></tr>';
+
+    postsTableBody.querySelectorAll('[data-edit-post]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const post = posts.find((p) => p.id === btn.dataset.editPost);
+        openPostModal(post);
+      });
+    });
+    postsTableBody.querySelectorAll('[data-delete-post]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const post = posts.find((p) => p.id === btn.dataset.deletePost);
+        if (!confirm(`Supprimer « ${post.title} » ?`)) return;
+        try {
+          await api('/api/admin/posts/' + encodeURIComponent(post.id), { method: 'DELETE' });
+          showToast('Publication supprimée.');
+          loadPosts();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  }
+
+  // ---------------- Contenu du site ----------------
+
+  const fieldsForm = document.getElementById('fieldsForm');
+  const fieldsFormError = document.getElementById('fieldsFormError');
+  const hoursTableBody = document.getElementById('hoursTableBody');
+  const hoursModal = document.getElementById('hoursModal');
+  const hoursForm = document.getElementById('hoursForm');
+  const hoursFormError = document.getElementById('hoursFormError');
+  const hoursModalTitle = document.getElementById('hoursModalTitle');
+  const cardModal = document.getElementById('cardModal');
+  const cardForm = document.getElementById('cardForm');
+  const cardFormError = document.getElementById('cardFormError');
+  const cardModalTitle = document.getElementById('cardModalTitle');
+  const cardIconSelect = document.getElementById('cardIconSelect');
+  const cardHrefField = document.getElementById('cardHrefField');
+
+  const CARD_SECTION_LABELS = { home: 'accueil', fraicheur: 'Fraîcheur & Local', services: 'Services' };
+
+  function fillFieldsForm(content) {
+    if (!fieldsForm) return;
+    const contact = content.contact || {};
+    fieldsForm.elements.topbarMessage.value = content.topbarMessage || '';
+    fieldsForm.elements.topbarHighlight.value = content.topbarHighlight || '';
+    fieldsForm.elements.footerTagline.value = content.footerTagline || '';
+    fieldsForm.elements.address.value = contact.address || '';
+    fieldsForm.elements.phone.value = contact.phone || '';
+    fieldsForm.elements.email.value = contact.email || '';
+    fieldsForm.elements.whatsapp.value = contact.whatsapp || '';
+    fieldsForm.elements.mapCaption.value = content.mapCaption || '';
+    fieldsForm.elements.freshNote.value = content.freshNote || '';
+  }
+
+  if (fieldsForm) {
+    fieldsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      fieldsFormError.hidden = true;
+      const payload = Object.fromEntries(new FormData(fieldsForm));
+      try {
+        await api('/api/admin/content/fields', { method: 'PUT', body: JSON.stringify(payload) });
+        showToast('Textes enregistrés.');
+      } catch (err) {
+        fieldsFormError.textContent = err.message;
+        fieldsFormError.hidden = false;
+      }
+    });
+  }
+
+  function renderHoursTable(hours) {
+    if (!hoursTableBody) return;
+    hoursTableBody.innerHTML = (hours || []).map((h) => `
+      <tr>
+        <td>${escapeHtml(h.label)}</td>
+        <td>${escapeHtml(h.value)}</td>
+        <td class="admin-row-actions">
+          <button type="button" class="btn btn-outline btn-sm" data-edit-hours="${escapeHtml(h.id)}">Modifier</button>
+          <button type="button" class="btn btn-outline btn-sm admin-btn-danger" data-delete-hours="${escapeHtml(h.id)}">Supprimer</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="3" class="admin-muted">Aucun horaire pour le moment.</td></tr>';
+
+    hoursTableBody.querySelectorAll('[data-edit-hours]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const row = (hours || []).find((h) => h.id === btn.dataset.editHours);
+        openHoursModal(row);
+      });
+    });
+    hoursTableBody.querySelectorAll('[data-delete-hours]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer cette ligne d’horaires ?')) return;
+        try {
+          await api('/api/admin/content/hours/' + encodeURIComponent(btn.dataset.deleteHours), { method: 'DELETE' });
+          showToast('Horaire supprimé.');
+          loadContent();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  }
+
+  function openHoursModal(row) {
+    if (!hoursModal) return;
+    hoursForm.reset();
+    hoursFormError.hidden = true;
+    if (row) {
+      hoursModalTitle.textContent = 'Modifier cette ligne';
+      hoursForm.elements.id.value = row.id;
+      hoursForm.elements.label.value = row.label;
+      hoursForm.elements.value.value = row.value;
+    } else {
+      hoursModalTitle.textContent = 'Ajouter une ligne d’horaires';
+      hoursForm.elements.id.value = '';
+    }
+    hoursModal.hidden = false;
+  }
+
+  if (document.getElementById('btnNewHours')) {
+    document.getElementById('btnNewHours').addEventListener('click', () => openHoursModal(null));
+    document.getElementById('btnCancelHours').addEventListener('click', () => { hoursModal.hidden = true; });
+    hoursForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hoursFormError.hidden = true;
+      const raw = Object.fromEntries(new FormData(hoursForm));
+      const payload = { label: raw.label, value: raw.value };
+      try {
+        if (raw.id) {
+          await api('/api/admin/content/hours/' + encodeURIComponent(raw.id), { method: 'PUT', body: JSON.stringify(payload) });
+          showToast('Horaire mis à jour.');
+        } else {
+          await api('/api/admin/content/hours', { method: 'POST', body: JSON.stringify(payload) });
+          showToast('Horaire ajouté.');
+        }
+        hoursModal.hidden = true;
+        loadContent();
+      } catch (err) {
+        hoursFormError.textContent = err.message;
+        hoursFormError.hidden = false;
+      }
+    });
+  }
+
+  function populateCardIconSelect(section) {
+    if (!cardIconSelect) return;
+    const isFresh = section === 'fraicheur';
+    const icons = isFresh ? window.PioIcons.FRESH : window.PioIcons.BADGE;
+    const labels = isFresh ? window.PioIcons.FRESH_LABELS : window.PioIcons.BADGE_LABELS;
+    cardIconSelect.innerHTML = Object.keys(icons).map((key) =>
+      `<option value="${key}">${escapeHtml(labels[key] || key)}</option>`
+    ).join('');
+  }
+
+  function openCardModal(section, card) {
+    if (!cardModal) return;
+    cardForm.reset();
+    cardFormError.hidden = true;
+    cardForm.elements.section.value = section;
+    populateCardIconSelect(section);
+    cardHrefField.hidden = section !== 'home';
+    if (card) {
+      cardModalTitle.textContent = 'Modifier « ' + card.title + ' »';
+      cardForm.elements.id.value = card.id;
+      cardForm.elements.title.value = card.title;
+      cardForm.elements.text.value = card.text || '';
+      cardForm.elements.icon.value = card.icon;
+      if (section === 'home') cardForm.elements.href.value = card.href || 'pages/catalogue.html';
+    } else {
+      cardModalTitle.textContent = 'Ajouter une carte (' + CARD_SECTION_LABELS[section] + ')';
+      cardForm.elements.id.value = '';
+    }
+    cardModal.hidden = false;
+  }
+
+  document.querySelectorAll('[data-new-card]').forEach((btn) => {
+    btn.addEventListener('click', () => openCardModal(btn.dataset.newCard, null));
+  });
+  if (document.getElementById('btnCancelCard')) {
+    document.getElementById('btnCancelCard').addEventListener('click', () => { cardModal.hidden = true; });
+  }
+  if (cardForm) {
+    cardForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      cardFormError.hidden = true;
+      const raw = Object.fromEntries(new FormData(cardForm));
+      const payload = { title: raw.title, text: raw.text, icon: raw.icon };
+      if (raw.section === 'home') payload.href = raw.href;
+      try {
+        if (raw.id) {
+          await api('/api/admin/content/cards/' + raw.section + '/' + encodeURIComponent(raw.id), { method: 'PUT', body: JSON.stringify(payload) });
+          showToast('Carte mise à jour.');
+        } else {
+          await api('/api/admin/content/cards/' + raw.section, { method: 'POST', body: JSON.stringify(payload) });
+          showToast('Carte ajoutée.');
+        }
+        cardModal.hidden = true;
+        loadContent();
+      } catch (err) {
+        cardFormError.textContent = err.message;
+        cardFormError.hidden = false;
+      }
+    });
+  }
+
+  function renderCardsTable(section, cards) {
+    const tbody = document.getElementById('cardsTableBody-' + section);
+    if (!tbody) return;
+    const showHref = section === 'home';
+    tbody.innerHTML = (cards || []).map((c) => `
+      <tr>
+        <td><strong>${escapeHtml(c.title)}</strong><br><span class="admin-muted">${escapeHtml(c.text || '')}</span></td>
+        ${showHref ? `<td class="admin-muted">${escapeHtml(c.href || '')}</td>` : ''}
+        <td class="admin-row-actions">
+          <button type="button" class="btn btn-outline btn-sm" data-edit-card="${escapeHtml(c.id)}">Modifier</button>
+          <button type="button" class="btn btn-outline btn-sm admin-btn-danger" data-delete-card="${escapeHtml(c.id)}">Supprimer</button>
+        </td>
+      </tr>
+    `).join('') || `<tr><td colspan="${showHref ? 3 : 2}" class="admin-muted">Aucune carte pour le moment.</td></tr>`;
+
+    tbody.querySelectorAll('[data-edit-card]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const card = (cards || []).find((c) => c.id === btn.dataset.editCard);
+        openCardModal(section, card);
+      });
+    });
+    tbody.querySelectorAll('[data-delete-card]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const card = (cards || []).find((c) => c.id === btn.dataset.deleteCard);
+        if (!confirm(`Supprimer la carte « ${card.title} » ?`)) return;
+        try {
+          await api('/api/admin/content/cards/' + section + '/' + encodeURIComponent(card.id), { method: 'DELETE' });
+          showToast('Carte supprimée.');
+          loadContent();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  }
+
+  async function loadContent() {
+    if (!fieldsForm) return; // pas d'onglet "Contenu du site" sur cette page
+    const content = await api('/api/content');
+    fillFieldsForm(content);
+    renderHoursTable(content.hours);
+    const cards = content.cards || {};
+    renderCardsTable('home', cards.home);
+    renderCardsTable('fraicheur', cards.fraicheur);
+    renderCardsTable('services', cards.services);
+  }
+
+  function loadAll() {
+    loadProducts();
+    loadPosts();
+    loadContent();
+  }
+
+  checkSession();
+})();

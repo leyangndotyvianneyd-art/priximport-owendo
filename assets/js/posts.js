@@ -1,14 +1,20 @@
 // posts.js
+// Charge data/posts.json (géré depuis pages/admin.html, ou modifiable à la
+// main) et affiche les publications sur la page Nouveautés — même source de
+// données que l'API /api/posts utilisée par l'application mobile, donc tout
+// changement fait par l'administrateur apparaît ici automatiquement.
 document.addEventListener('DOMContentLoaded', () => {
   const grid = document.querySelector('[data-posts-grid]');
-  if (!grid || !window.POSTS) return;
+  if (!grid) return;
 
   const base = window.DATA_BASE || '';
   const isPreview = grid.classList.contains('preview');
   const chipsWrap = document.querySelector('[data-posts-filters]');
 
-  const sorted = [...window.POSTS].sort((a, b) => new Date(b.date) - new Date(a.date));
-  const initialList = isPreview ? sorted.slice(0, 3) : sorted;
+  function resolveAsset(src) {
+    if (!src) return '';
+    return /^https?:\/\//.test(src) ? src : `${base}${src}`;
+  }
 
   function isNew(dateStr) {
     const diffDays = (Date.now() - new Date(dateStr).getTime()) / 86400000;
@@ -21,13 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let media;
     if (post.type === 'video') {
-      const videoRef = post.youtube ? `yt:${post.youtube}` : `${base}${post.video}`;
+      const videoRef = post.youtube ? `yt:${post.youtube}` : resolveAsset(post.video);
       media = `<div class="post-media" data-video="${videoRef}">
-                 <img src="${base}${post.thumbnail}" alt="${post.title}" loading="lazy">
+                 <img src="${resolveAsset(post.thumbnail)}" alt="${post.title}" loading="lazy">
                  <span class="play"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="26" fill="#F4C430"/><path d="M21 16l16 10-16 10V16Z" fill="#241C15"/></svg></span>
                </div>`;
     } else {
-      media = `<div class="post-media"><img src="${base}${post.media}" alt="${post.title}" loading="lazy"></div>`;
+      media = `<div class="post-media"><img src="${resolveAsset(post.media)}" alt="${post.title}" loading="lazy"></div>`;
     }
 
     return `
@@ -50,18 +56,31 @@ document.addEventListener('DOMContentLoaded', () => {
       : `<div class="posts-empty">Aucune publication pour ce filtre.</div>`;
   }
 
-  render(initialList);
+  fetch(base + 'data/posts.json')
+    .then((res) => {
+      if (!res.ok) throw new Error('Impossible de charger les publications.');
+      return res.json();
+    })
+    .then((posts) => {
+      const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const initialList = isPreview ? sorted.slice(0, 3) : sorted;
+      render(initialList);
 
-  if (chipsWrap) {
-    chipsWrap.addEventListener('click', (e) => {
-      const btn = e.target.closest('.filter-chip');
-      if (!btn) return;
-      chipsWrap.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      const type = btn.dataset.filter;
-      render(type === 'all' ? sorted : sorted.filter(p => p.type === type));
+      if (chipsWrap) {
+        chipsWrap.addEventListener('click', (e) => {
+          const btn = e.target.closest('.filter-chip');
+          if (!btn) return;
+          chipsWrap.querySelectorAll('.filter-chip').forEach((c) => c.classList.remove('active'));
+          btn.classList.add('active');
+          const type = btn.dataset.filter;
+          render(type === 'all' ? sorted : sorted.filter((p) => p.type === type));
+        });
+      }
+    })
+    .catch((err) => {
+      grid.innerHTML = '<div class="posts-empty">Erreur de chargement des publications.</div>';
+      console.error(err);
     });
-  }
 
   const lightbox = document.getElementById('lightbox');
   if (lightbox) {
