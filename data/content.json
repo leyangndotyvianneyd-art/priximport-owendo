@@ -66,14 +66,14 @@
         "icon": "fish",
         "title": "Poisson du port",
         "text": "Arrivage frais en lien avec les pêcheurs du port d'Owendo.",
-        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local"
+        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local&q=poisson"
       },
       {
         "id": "fresh-veggie",
         "icon": "veggie",
         "title": "Légumes de saison",
         "text": "Gombo, feuilles de manioc, piments — au rythme des récoltes.",
-        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local"
+        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local&q=l%C3%A9gume"
       },
       {
         "id": "fresh-morning",
