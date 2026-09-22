@@ -109,6 +109,9 @@
     "price": 2500,
     "category": "Fraîcheur & Local",
     "image": "https://c8.alamy.com/compfr/2y6ggme/italie-25-septembre-2024-poisson-congele-emballe-et-expose-dans-de-grandes-vitrines-refrigerees-pour-la-vente-dans-le-magasin-de-rabais-de-supermarche-italien-2y6ggme.jpg",
+    "images": [
+      "https://cdn.metro-online.com/-/media/Project/MCW/FR_Metro/Images/services-inspirations/metro/univers-produits/maree/OpenGraph/maree.jpg?rev=f0570d86879744ff8aed1a9ab6fcd066"
+    ],
     "active": true,
     "promo": false
   },
@@ -182,6 +185,16 @@
     "promo": false,
     "category": "Bébé",
     "image": "https://c8.alamy.com/compfr/2tdcmym/allee-des-produits-pour-bebes-au-supermarche-de-san-diego-californie-2tdcmym.jpg",
+    "active": true
+  },
+  {
+    "id": "poissons",
+    "name": "Poissons",
+    "unit": "1kg",
+    "price": 1200,
+    "promo": false,
+    "category": "Fraîcheur & Local",
+    "image": "https://cdn.metro-online.com/-/media/Project/MCW/FR_Metro/Images/services-inspirations/metro/univers-produits/maree/OpenGraph/maree.jpg?rev=f0570d86879744ff8aed1a9ab6fcd066",
     "active": true
   }
 ]

@@ -130,6 +130,7 @@
       productForm.elements.price.value = product.price;
       productForm.elements.oldPrice.value = product.oldPrice || '';
       productForm.elements.image.value = product.image || '';
+      productForm.elements.images.value = (product.images || []).join('\n');
       productForm.elements.group.value = product.group || '';
       productForm.elements.promo.checked = !!product.promo;
       productForm.elements.promoStart.value = product.promoStart || '';
@@ -173,6 +174,7 @@
       price: Number(raw.price),
       oldPrice: raw.oldPrice ? Number(raw.oldPrice) : '',
       image: raw.image,
+      images: raw.images ? raw.images.split('\n').map((s) => s.trim()).filter(Boolean) : [],
       group: raw.group || '',
       promo: isPromo,
       promoStart: isPromo ? raw.promoStart : '',

@@ -156,6 +156,45 @@
       lightbox.classList.add('open');
     }
 
+    // Plusieurs photos pour un même produit (ex. plusieurs vues de l'étal de
+    // poisson) : le client peut faire défiler (flèches, points, glisser au
+    // doigt) au lieu d'une seule photo fixe.
+    function openGalleryLightbox(images, name) {
+      media.className = 'lightbox-media is-gallery';
+      media.innerHTML = `
+        <div class="gallery">
+          <button type="button" class="gallery-arrow gallery-prev" aria-label="Photo précédente">&#8249;</button>
+          <div class="gallery-track">
+            ${images.map(src => `<div class="gallery-slide"><img src="${src}" alt="${name}"></div>`).join('')}
+          </div>
+          <button type="button" class="gallery-arrow gallery-next" aria-label="Photo suivante">&#8250;</button>
+        </div>
+        <div class="gallery-dots">
+          ${images.map((_, i) => `<button type="button" class="gallery-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Aller à la photo ${i + 1}"></button>`).join('')}
+        </div>
+      `;
+      lightbox.classList.add('open');
+
+      const track = media.querySelector('.gallery-track');
+      const dots = media.querySelectorAll('.gallery-dot');
+
+      function currentIndex() {
+        return Math.round(track.scrollLeft / track.clientWidth);
+      }
+      function goToSlide(i) {
+        const clamped = Math.max(0, Math.min(images.length - 1, i));
+        track.children[clamped].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+
+      media.querySelector('.gallery-prev').addEventListener('click', () => goToSlide(currentIndex() - 1));
+      media.querySelector('.gallery-next').addEventListener('click', () => goToSlide(currentIndex() + 1));
+      dots.forEach(dot => dot.addEventListener('click', () => goToSlide(Number(dot.dataset.index))));
+      track.addEventListener('scroll', () => {
+        const i = currentIndex();
+        dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+      }, { passive: true });
+    }
+
     function openCompareLightbox(items) {
       media.className = 'lightbox-media is-compare';
       media.innerHTML = `
@@ -185,8 +224,11 @@
       const group = product.group
         ? allProducts.filter(p => p.group === product.group)
         : [product];
+      const gallery = [product.image, ...(product.images || [])].filter(Boolean).map(resolveImage);
       if (group.length > 1) {
         openCompareLightbox(group);
+      } else if (gallery.length > 1) {
+        openGalleryLightbox(gallery, product.name);
       } else {
         openImageLightbox(resolveImage(product.image), product.name);
       }
@@ -217,6 +259,9 @@
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeLightbox();
+      if (!lightbox.classList.contains('open') || !media.classList.contains('is-gallery')) return;
+      if (e.key === 'ArrowLeft') media.querySelector('.gallery-prev')?.click();
+      if (e.key === 'ArrowRight') media.querySelector('.gallery-next')?.click();
     });
   }
 
