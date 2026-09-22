@@ -996,6 +996,44 @@ footer ul a:hover { color: var(--yellow); }
   max-height: 80vh;
   object-fit: contain;
 }
+.lightbox-media.is-compare {
+  aspect-ratio: auto;
+  width: 100%;
+  max-width: 920px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 28px;
+}
+.compare-title {
+  font-family: 'Anton', sans-serif;
+  color: var(--green-dark);
+  margin-bottom: 16px;
+}
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+}
+.compare-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+.compare-card-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background-color: var(--cream);
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
+}
+.compare-card h4 { font-size: 0.95rem; margin-bottom: 8px; }
+.compare-card .btn-add-cart { margin-top: auto; }
 .lightbox-close {
   position: absolute;
   top: 24px; right: 24px;

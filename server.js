@@ -231,6 +231,7 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       ...(p.promo && p.promoEnd ? { promoEnd: String(p.promoEnd).trim() } : {}),
       category: String(p.category).trim(),
       image: p.image ? String(p.image).trim() : '',
+      ...(p.group ? { group: String(p.group).trim() } : {}),
       active: p.active !== false
     };
     products.push(product);
@@ -265,6 +266,10 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
       } else {
         updated.oldPrice = Number(p.oldPrice);
       }
+    }
+    if (p.group != null) {
+      if (p.group === '') delete updated.group;
+      else updated.group = String(p.group).trim();
     }
     if (!updated.promo) {
       // Un produit qui n'est plus en promotion n'a plus besoin de dates.

@@ -111,6 +111,7 @@
   const productPromoCheckbox = document.getElementById('productPromoCheckbox');
   const productPromoDates = document.getElementById('productPromoDates');
   let knownCategories = [];
+  let knownGroups = [];
 
   function togglePromoDates() {
     productPromoDates.hidden = !productPromoCheckbox.checked;
@@ -129,6 +130,7 @@
       productForm.elements.price.value = product.price;
       productForm.elements.oldPrice.value = product.oldPrice || '';
       productForm.elements.image.value = product.image || '';
+      productForm.elements.group.value = product.group || '';
       productForm.elements.promo.checked = !!product.promo;
       productForm.elements.promoStart.value = product.promoStart || '';
       productForm.elements.promoEnd.value = product.promoEnd || '';
@@ -141,6 +143,8 @@
     togglePromoDates();
     const categoryList = document.getElementById('categoryList');
     categoryList.innerHTML = knownCategories.map((c) => `<option value="${escapeHtml(c)}">`).join('');
+    const groupList = document.getElementById('groupList');
+    groupList.innerHTML = knownGroups.map((g) => `<option value="${escapeHtml(g)}">`).join('');
     productModal.hidden = false;
   }
 
@@ -169,6 +173,7 @@
       price: Number(raw.price),
       oldPrice: raw.oldPrice ? Number(raw.oldPrice) : '',
       image: raw.image,
+      group: raw.group || '',
       promo: isPromo,
       promoStart: isPromo ? raw.promoStart : '',
       promoEnd: isPromo ? raw.promoEnd : '',
@@ -203,6 +208,7 @@
   async function loadProducts() {
     const products = await api('/api/products');
     knownCategories = [...new Set(products.map((p) => p.category).filter(Boolean))];
+    knownGroups = [...new Set(products.map((p) => p.group).filter(Boolean))];
     productsTableBody.innerHTML = products.map((p) => `
       <tr>
         <td>

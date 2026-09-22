@@ -37,7 +37,30 @@
     "promo": false,
     "category": "Épicerie",
     "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpKG8NWEOPgIJN2kKWTNAW3hPwPNxpgPtPoyafNuPdYA&s=10",
-    "active": true
+    "active": true,
+    "group": "farine"
+  },
+  {
+    "id": "farine-super-t45-1kg",
+    "name": "Farine Super T45",
+    "unit": "Paquet 1kg",
+    "price": 1300,
+    "promo": false,
+    "category": "Épicerie",
+    "image": "https://placehold.co/500x500/f4c430/1b4332?text=Farine+Super+T45",
+    "active": true,
+    "group": "farine"
+  },
+  {
+    "id": "farine-premium-5kg",
+    "name": "Farine Premium",
+    "unit": "Sac 5kg",
+    "price": 4800,
+    "promo": false,
+    "category": "Épicerie",
+    "image": "https://placehold.co/500x500/e8871e/ffffff?text=Farine+Premium+5kg",
+    "active": true,
+    "group": "farine"
   },
   {
     "id": "lait-poudre-900g",

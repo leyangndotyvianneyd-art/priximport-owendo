@@ -231,6 +231,11 @@
       <label>Image (URL, ou nom de fichier dans assets/img/products/)
         <input type="text" name="image">
       </label>
+      <label>Groupe de comparaison (optionnel)
+        <input type="text" name="group" list="groupList">
+        <datalist id="groupList"></datalist>
+      </label>
+      <p class="admin-hint">Donne le même groupe à plusieurs produits (ex. "farine") pour qu'un clic sur leur photo, côté site, ouvre une comparaison photos + prix au lieu d'une simple photo agrandie.</p>
       <div class="admin-form-row admin-form-checkboxes">
         <label class="admin-checkbox"><input type="checkbox" name="promo" id="productPromoCheckbox"> En promotion</label>
         <label class="admin-checkbox"><input type="checkbox" name="active" checked> Actif (visible sur le site)</label>

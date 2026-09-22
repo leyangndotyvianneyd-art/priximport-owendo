@@ -110,7 +110,7 @@
       return `
       <div class="product-card">
         ${promoActive ? '<span class="badge-promo">Promo</span>' : ''}
-        <div class="product-image" style="background-image:url('${resolveImage(p.image)}')" data-zoom-img="${resolveImage(p.image)}" data-zoom-name="${p.name}" role="button" tabindex="0" aria-label="Voir la photo de ${p.name} en grand"></div>
+        <div class="product-image" style="background-image:url('${resolveImage(p.image)}')" data-zoom-id="${p.id}" role="button" tabindex="0" aria-label="Voir la photo de ${p.name} en grand"></div>
         <div class="product-body">
           <p class="product-category">${p.category}</p>
           <h3>${p.name}</h3>
@@ -125,46 +125,91 @@
     `;
     }).join('');
 
-    grid.querySelectorAll('.btn-add-cart').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const product = allProducts.find(p => p.id === btn.dataset.id);
-        if (!product || !window.Cart) return;
-        window.Cart.add(product, 1);
-        if (typeof showToast === 'function') showToast(`${product.name} ajouté au panier`);
-      });
+    bindAddToCartButtons(grid);
+  }
+
+  function addToCartById(id) {
+    const product = allProducts.find(p => p.id === id);
+    if (!product || !window.Cart) return;
+    window.Cart.add(product, 1);
+    if (typeof showToast === 'function') showToast(`${product.name} ajouté au panier`);
+  }
+
+  function bindAddToCartButtons(container) {
+    container.querySelectorAll('.btn-add-cart').forEach(btn => {
+      btn.addEventListener('click', () => addToCartById(btn.dataset.id));
     });
   }
 
-  // Clic (ou Entrée/Espace) sur la photo d'un produit : l'affiche en grand
-  // dans la lightbox déjà utilisée ailleurs sur le site pour les vidéos.
+  // Clic (ou Entrée/Espace) sur la photo d'un produit : ouvre la lightbox
+  // déjà utilisée ailleurs sur le site pour les vidéos. Si le produit a un
+  // "group" partagé avec d'autres produits actifs (ex. plusieurs marques de
+  // farine), on affiche une vue comparative (photos + prix) plutôt qu'une
+  // simple photo agrandie, pour que le client puisse comparer d'un coup d'œil.
   const lightbox = document.getElementById('lightbox');
   if (lightbox) {
     const media = lightbox.querySelector('.lightbox-media');
 
     function openImageLightbox(src, name) {
-      media.classList.add('is-image');
+      media.className = 'lightbox-media is-image';
       media.innerHTML = `<img src="${src}" alt="${name}">`;
       lightbox.classList.add('open');
     }
 
+    function openCompareLightbox(items) {
+      media.className = 'lightbox-media is-compare';
+      media.innerHTML = `
+        <h3 class="compare-title">Comparer les options</h3>
+        <div class="compare-grid">
+          ${items.map(p => `
+            <div class="compare-card">
+              <div class="compare-card-image" style="background-image:url('${resolveImage(p.image)}')"></div>
+              <p class="product-category">${p.category}</p>
+              <h4>${p.name}</h4>
+              <div class="product-price">
+                <span class="price">${formatPrice(p.price)}</span>
+              </div>
+              <p class="product-unit">Prix / ${p.unit}</p>
+              <button type="button" class="btn btn-primary btn-add-cart" data-id="${p.id}">Ajouter au panier</button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      bindAddToCartButtons(media);
+      lightbox.classList.add('open');
+    }
+
+    function openProductLightbox(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+      const group = product.group
+        ? allProducts.filter(p => p.group === product.group)
+        : [product];
+      if (group.length > 1) {
+        openCompareLightbox(group);
+      } else {
+        openImageLightbox(resolveImage(product.image), product.name);
+      }
+    }
+
     function closeLightbox() {
       lightbox.classList.remove('open');
-      media.classList.remove('is-image');
+      media.className = 'lightbox-media';
       media.innerHTML = '';
     }
 
     grid.addEventListener('click', (e) => {
-      const el = e.target.closest('[data-zoom-img]');
+      const el = e.target.closest('[data-zoom-id]');
       if (!el) return;
-      openImageLightbox(el.dataset.zoomImg, el.dataset.zoomName);
+      openProductLightbox(el.dataset.zoomId);
     });
 
     grid.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      const el = e.target.closest('[data-zoom-img]');
+      const el = e.target.closest('[data-zoom-id]');
       if (!el) return;
       e.preventDefault();
-      openImageLightbox(el.dataset.zoomImg, el.dataset.zoomName);
+      openProductLightbox(el.dataset.zoomId);
     });
 
     lightbox.addEventListener('click', (e) => {
