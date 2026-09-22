@@ -256,13 +256,15 @@
   const postFormError = document.getElementById('postFormError');
   const postModalTitle = document.getElementById('postModalTitle');
   const postTypeSelect = document.getElementById('postTypeSelect');
-  const postPhotoFields = document.getElementById('postPhotoFields');
+  const postMediaLabel = document.getElementById('postMediaLabel');
   const postVideoFields = document.getElementById('postVideoFields');
 
   function togglePostTypeFields() {
     const isVideo = postTypeSelect.value === 'video';
-    postPhotoFields.hidden = isVideo;
     postVideoFields.hidden = !isVideo;
+    postMediaLabel.firstChild.textContent = isVideo
+      ? 'Vidéo (lien YouTube, lien direct .mp4, ou nom de fichier dans assets/videos/) '
+      : 'Image (URL, ou nom de fichier dans assets/img/posts/) ';
   }
   postTypeSelect.addEventListener('change', togglePostTypeFields);
 
@@ -277,9 +279,7 @@
       postForm.elements.type.value = post.type;
       postForm.elements.tag.value = post.tag || '';
       postForm.elements.date.value = post.date || '';
-      postForm.elements.media.value = post.type !== 'video' ? (post.media || '') : '';
-      postForm.elements.videoUrl.value = post.type === 'video' ? (post.media || '') : '';
-      postForm.elements.youtube.value = post.youtube || '';
+      postForm.elements.media.value = post.media || post.youtube || '';
       postForm.elements.thumbnail.value = post.thumbnail || '';
     } else {
       postModalTitle.textContent = 'Ajouter une publication';
@@ -297,8 +297,8 @@
     e.preventDefault();
     postFormError.hidden = true;
     const raw = Object.fromEntries(new FormData(postForm));
-    if (raw.type === 'video' && !raw.youtube && !raw.videoUrl) {
-      postFormError.textContent = 'Renseigne soit un ID YouTube, soit un lien vidéo direct.';
+    if (!raw.media) {
+      postFormError.textContent = raw.type === 'video' ? 'Renseigne un lien YouTube ou une vidéo.' : 'Renseigne une image.';
       postFormError.hidden = false;
       return;
     }
@@ -308,8 +308,7 @@
       type: raw.type,
       tag: raw.tag,
       date: raw.date,
-      media: raw.type === 'photo' ? raw.media : raw.videoUrl,
-      youtube: raw.type === 'video' ? raw.youtube : '',
+      media: raw.media,
       thumbnail: raw.type === 'video' ? raw.thumbnail : ''
     };
     try {

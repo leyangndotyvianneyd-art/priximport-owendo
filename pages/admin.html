@@ -290,20 +290,12 @@
       <label>Date
         <input type="date" name="date">
       </label>
-      <div id="postPhotoFields">
-        <label>Image (URL)
-          <input type="text" name="media">
-        </label>
-      </div>
+      <label id="postMediaLabel">Image (URL, ou nom de fichier dans assets/img/posts/)
+        <input type="text" name="media" id="postMediaInput">
+      </label>
       <div id="postVideoFields" hidden>
-        <p class="admin-hint">Deux façons d'ajouter une vidéo — remplis seulement l'une des deux ci-dessous :</p>
-        <label>Option 1 : lien YouTube (ou juste l'ID, la partie après "v=")
-          <input type="text" name="youtube" placeholder="ex. https://youtube.com/shorts/dQw4w9WgXcQ">
-        </label>
-        <label>Option 2 : lien direct vers un fichier vidéo (.mp4)
-          <input type="text" name="videoUrl" placeholder="https://... .mp4, ou un fichier dans assets/videos/">
-        </label>
-        <label>Miniature (URL d'une image, affichée avant lecture)
+        <p class="admin-hint">Colle un lien YouTube, ou le lien/nom de fichier d'une vidéo (.mp4) — exactement comme pour une photo ci-dessus.</p>
+        <label>Miniature (optionnel — auto-générée pour un lien YouTube, sinon affiche juste le bouton lecture)
           <input type="text" name="thumbnail">
         </label>
       </div>

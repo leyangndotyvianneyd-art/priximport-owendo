@@ -25,6 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return match ? match[1] : str;
   }
 
+  // Un seul champ "média" sert pour tout, comme pour les photos : on détecte
+  // tout seul s'il s'agit d'un lien YouTube (ou d'un ID YouTube brut) plutôt
+  // que de forcer l'admin à choisir entre deux champs séparés.
+  function detectYoutubeId(raw) {
+    const str = String(raw || '').trim();
+    if (!str) return '';
+    if (/youtu\.be\/|youtube\.com\//.test(str)) return extractYoutubeId(str);
+    if (/^[A-Za-z0-9_-]{11}$/.test(str)) return str;
+    return '';
+  }
+
   function isNew(dateStr) {
     const diffDays = (Date.now() - new Date(dateStr).getTime()) / 86400000;
     return diffDays <= 7;
@@ -36,9 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let media;
     if (post.type === 'video') {
-      const videoRef = post.youtube ? `yt:${extractYoutubeId(post.youtube)}` : resolveAsset(post.media);
-      media = `<div class="post-media" data-video="${videoRef}">
-                 <img src="${resolveAsset(post.thumbnail)}" alt="${post.title}" loading="lazy">
+      const source = post.media || post.youtube || '';
+      const ytId = detectYoutubeId(source);
+      const videoRef = ytId ? `yt:${ytId}` : resolveAsset(source);
+      const thumb = post.thumbnail ? resolveAsset(post.thumbnail) : (ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : '');
+      media = `<div class="post-media" data-video="${videoRef}" role="button" tabindex="0" aria-label="Lire la vidéo « ${post.title} »">
+                 ${thumb ? `<img src="${thumb}" alt="${post.title}" loading="lazy">` : ''}
                  <span class="play"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="26" fill="#F4C430"/><path d="M21 16l16 10-16 10V16Z" fill="#241C15"/></svg></span>
                </div>`;
     } else {
@@ -96,22 +110,24 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lightbox) {
     const media = lightbox.querySelector('.lightbox-media');
 
+    function openVideoLightbox(src) {
+      media.innerHTML = src.startsWith('yt:')
+        ? `<iframe src="https://www.youtube.com/embed/${src.slice(3)}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+        : `<video src="${src}" controls autoplay></video>`;
+      lightbox.classList.add('open');
+    }
+
     grid.addEventListener('click', (e) => {
       const videoEl = e.target.closest('[data-video]');
-      if (videoEl) {
-        const src = videoEl.dataset.video;
-        media.innerHTML = src.startsWith('yt:')
-          ? `<iframe src="https://www.youtube.com/embed/${src.slice(3)}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
-          : `<video src="${src}" controls autoplay></video>`;
-        lightbox.classList.add('open');
-        return;
-      }
+      if (videoEl) { openVideoLightbox(videoEl.dataset.video); return; }
       const imgEl = e.target.closest('[data-zoom-img]');
       if (imgEl) openImageLightbox(imgEl.dataset.zoomImg, imgEl.dataset.zoomName);
     });
 
     grid.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
+      const videoEl = e.target.closest('[data-video]');
+      if (videoEl) { e.preventDefault(); openVideoLightbox(videoEl.dataset.video); return; }
       const imgEl = e.target.closest('[data-zoom-img]');
       if (!imgEl) return;
       e.preventDefault();
