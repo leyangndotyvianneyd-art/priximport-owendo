@@ -110,7 +110,7 @@
       return `
       <div class="product-card">
         ${promoActive ? '<span class="badge-promo">Promo</span>' : ''}
-        <div class="product-image" style="background-image:url('${resolveImage(p.image)}')"></div>
+        <div class="product-image" style="background-image:url('${resolveImage(p.image)}')" data-zoom-img="${resolveImage(p.image)}" data-zoom-name="${p.name}" role="button" tabindex="0" aria-label="Voir la photo de ${p.name} en grand"></div>
         <div class="product-body">
           <p class="product-category">${p.category}</p>
           <h3>${p.name}</h3>
@@ -132,6 +132,46 @@
         window.Cart.add(product, 1);
         if (typeof showToast === 'function') showToast(`${product.name} ajouté au panier`);
       });
+    });
+  }
+
+  // Clic (ou Entrée/Espace) sur la photo d'un produit : l'affiche en grand
+  // dans la lightbox déjà utilisée ailleurs sur le site pour les vidéos.
+  const lightbox = document.getElementById('lightbox');
+  if (lightbox) {
+    const media = lightbox.querySelector('.lightbox-media');
+
+    function openImageLightbox(src, name) {
+      media.classList.add('is-image');
+      media.innerHTML = `<img src="${src}" alt="${name}">`;
+      lightbox.classList.add('open');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      media.classList.remove('is-image');
+      media.innerHTML = '';
+    }
+
+    grid.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-zoom-img]');
+      if (!el) return;
+      openImageLightbox(el.dataset.zoomImg, el.dataset.zoomName);
+    });
+
+    grid.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const el = e.target.closest('[data-zoom-img]');
+      if (!el) return;
+      e.preventDefault();
+      openImageLightbox(el.dataset.zoomImg, el.dataset.zoomName);
+    });
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target.closest('.lightbox-close') || e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
     });
   }
 

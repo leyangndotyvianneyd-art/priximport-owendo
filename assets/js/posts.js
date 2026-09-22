@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
                  <span class="play"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="26" fill="#F4C430"/><path d="M21 16l16 10-16 10V16Z" fill="#241C15"/></svg></span>
                </div>`;
     } else {
-      media = `<div class="post-media"><img src="${resolveAsset(post.media)}" alt="${post.title}" loading="lazy"></div>`;
+      const src = resolveAsset(post.media);
+      media = `<div class="post-media" data-zoom-img="${src}" data-zoom-name="${post.title}" role="button" tabindex="0" aria-label="Voir la photo « ${post.title} » en grand"><img src="${src}" alt="${post.title}" loading="lazy"></div>`;
     }
 
     return `
@@ -87,17 +88,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const media = lightbox.querySelector('.lightbox-media');
 
     grid.addEventListener('click', (e) => {
-      const el = e.target.closest('[data-video]');
-      if (!el) return;
-      const src = el.dataset.video;
-      media.innerHTML = src.startsWith('yt:')
-        ? `<iframe src="https://www.youtube.com/embed/${src.slice(3)}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
-        : `<video src="${src}" controls autoplay></video>`;
-      lightbox.classList.add('open');
+      const videoEl = e.target.closest('[data-video]');
+      if (videoEl) {
+        const src = videoEl.dataset.video;
+        media.innerHTML = src.startsWith('yt:')
+          ? `<iframe src="https://www.youtube.com/embed/${src.slice(3)}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+          : `<video src="${src}" controls autoplay></video>`;
+        lightbox.classList.add('open');
+        return;
+      }
+      const imgEl = e.target.closest('[data-zoom-img]');
+      if (imgEl) openImageLightbox(imgEl.dataset.zoomImg, imgEl.dataset.zoomName);
     });
+
+    grid.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const imgEl = e.target.closest('[data-zoom-img]');
+      if (!imgEl) return;
+      e.preventDefault();
+      openImageLightbox(imgEl.dataset.zoomImg, imgEl.dataset.zoomName);
+    });
+
+    function openImageLightbox(src, name) {
+      media.classList.add('is-image');
+      media.innerHTML = `<img src="${src}" alt="${name}">`;
+      lightbox.classList.add('open');
+    }
 
     function closeLightbox() {
       lightbox.classList.remove('open');
+      media.classList.remove('is-image');
       media.innerHTML = '';
     }
 
