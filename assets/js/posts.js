@@ -16,6 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return /^https?:\/\//.test(src) ? src : `${base}${src}`;
   }
 
+  // Accepte aussi bien un ID brut qu'un lien YouTube complet (watch?v=,
+  // youtu.be/, shorts/, embed/) — l'admin ne colle pas toujours juste l'ID.
+  function extractYoutubeId(input) {
+    if (!input) return '';
+    const str = String(input).trim();
+    const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
+    return match ? match[1] : str;
+  }
+
   function isNew(dateStr) {
     const diffDays = (Date.now() - new Date(dateStr).getTime()) / 86400000;
     return diffDays <= 7;
@@ -27,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let media;
     if (post.type === 'video') {
-      const videoRef = post.youtube ? `yt:${post.youtube}` : resolveAsset(post.video);
+      const videoRef = post.youtube ? `yt:${extractYoutubeId(post.youtube)}` : resolveAsset(post.media);
       media = `<div class="post-media" data-video="${videoRef}">
                  <img src="${resolveAsset(post.thumbnail)}" alt="${post.title}" loading="lazy">
                  <span class="play"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="26" fill="#F4C430"/><path d="M21 16l16 10-16 10V16Z" fill="#241C15"/></svg></span>
