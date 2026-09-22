@@ -1287,6 +1287,7 @@ footer ul a:hover { color: var(--yellow); }
   border-radius: 6px;
 }
 #adminLoginForm label,
+#fieldsForm label,
 .admin-modal label {
   display: block;
   font-size: 0.85rem;
@@ -1295,6 +1296,8 @@ footer ul a:hover { color: var(--yellow); }
   margin-bottom: 14px;
 }
 #adminLoginForm input,
+#fieldsForm input,
+#fieldsForm textarea,
 .admin-modal input,
 .admin-modal select,
 .admin-modal textarea {
@@ -1307,6 +1310,7 @@ footer ul a:hover { color: var(--yellow); }
   font-family: inherit;
   font-size: 0.9rem;
 }
+#fieldsForm textarea,
 .admin-modal textarea { resize: vertical; }
 #adminLoginForm .btn { width: 100%; justify-content: center; margin-top: 6px; }
 .admin-error {
