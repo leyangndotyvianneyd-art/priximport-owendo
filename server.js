@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -174,6 +175,49 @@ function requireAdmin(req, res, next) {
   }
   next();
 }
+
+// ---- Envoi de fichiers (photos produits/publications, vidéos) ----
+// Permet à l'admin d'envoyer un fichier depuis son ordinateur (bouton
+// "choisir un fichier" / glisser-déposer) plutôt que de devoir coller une
+// URL ou compter sur quelqu'un d'autre pour déposer le fichier sur le
+// serveur. Le champ "kind" (envoyé avant le fichier dans le formulaire)
+// détermine le dossier de destination.
+const UPLOAD_DESTS = {
+  video: 'assets/videos',
+  'product-image': 'assets/img/products',
+  'post-image': 'assets/img/posts'
+};
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dest = UPLOAD_DESTS[req.body.kind];
+      if (!dest) return cb(new Error('Type de fichier inconnu.'));
+      cb(null, path.join(__dirname, dest));
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      const base = slugify(path.basename(file.originalname, ext)) || 'fichier';
+      cb(null, `${base}-${Date.now().toString(36)}${ext}`);
+    }
+  }),
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100 Mo
+  fileFilter: (req, file, cb) => {
+    const isVideo = req.body.kind === 'video';
+    const okType = isVideo ? file.mimetype.startsWith('video/') : file.mimetype.startsWith('image/');
+    if (!okType) return cb(new Error(isVideo ? "Ce fichier n'est pas une vidéo." : "Ce fichier n'est pas une image."));
+    cb(null, true);
+  }
+});
+
+app.post('/api/admin/upload', requireAdmin, (req, res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    if (!req.file) return res.status(400).json({ error: 'Aucun fichier reçu.' });
+    const dest = UPLOAD_DESTS[req.body.kind];
+    res.json({ success: true, path: `${dest}/${req.file.filename}` });
+  });
+});
 
 app.post('/api/admin/login', async (req, res) => {
   const { email, password } = req.body || {};

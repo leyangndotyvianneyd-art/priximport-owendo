@@ -35,6 +35,62 @@
     return body;
   }
 
+  // Envoie un fichier choisi par l'admin (photo ou vidéo) au serveur, qui le
+  // place dans le bon dossier de assets/ et renvoie son chemin — pas de
+  // Content-Type manuel ici, le navigateur doit fixer lui-même la frontière
+  // multipart/form-data.
+  async function uploadFile(file, kind) {
+    const formData = new FormData();
+    formData.append('kind', kind);
+    formData.append('file', file);
+    const res = await fetch('/api/admin/upload', { method: 'POST', credentials: 'same-origin', body: formData });
+    let body = {};
+    try { body = await res.json(); } catch (e) { /* réponse vide */ }
+    if (!res.ok) throw new Error(body.error || "Erreur d'envoi.");
+    return body.path;
+  }
+
+  // Branche chaque zone .admin-upload (clic ou glisser-déposer) à
+  // uploadFile(), et écrit le chemin renvoyé dans le champ texte associé
+  // (data-upload-target) — en le remplaçant, ou en l'ajoutant à la suite
+  // pour un champ à plusieurs photos (data-upload-append="true").
+  function initUploaders() {
+    document.querySelectorAll('.admin-upload').forEach((zone) => {
+      const fileInput = zone.querySelector('input[type=file]');
+      const append = zone.dataset.uploadAppend === 'true';
+
+      function handleFiles(files) {
+        const target = document.getElementById(zone.dataset.uploadTarget);
+        [...files].forEach(async (file) => {
+          zone.classList.add('uploading');
+          try {
+            const uploadedPath = await uploadFile(file, zone.dataset.uploadKind);
+            target.value = append && target.value ? target.value + '\n' + uploadedPath : uploadedPath;
+            showToast('Fichier envoyé.');
+          } catch (err) {
+            showToast(err.message);
+          } finally {
+            zone.classList.remove('uploading');
+          }
+        });
+      }
+
+      zone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) handleFiles(fileInput.files);
+        fileInput.value = '';
+      });
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+      });
+    });
+  }
+  initUploaders();
+
   function renderTopbar(email) {
     topbarActions.innerHTML = '';
     const span = document.createElement('span');
@@ -257,6 +313,7 @@
   const postModalTitle = document.getElementById('postModalTitle');
   const postTypeSelect = document.getElementById('postTypeSelect');
   const postMediaLabel = document.getElementById('postMediaLabel');
+  const postMediaUpload = document.getElementById('postMediaUpload');
   const postVideoFields = document.getElementById('postVideoFields');
 
   function togglePostTypeFields() {
@@ -265,6 +322,11 @@
     postMediaLabel.firstChild.textContent = isVideo
       ? 'Vidéo (lien YouTube, lien direct .mp4, ou nom de fichier dans assets/videos/) '
       : 'Image (URL, ou nom de fichier dans assets/img/posts/) ';
+    postMediaUpload.dataset.uploadKind = isVideo ? 'video' : 'post-image';
+    postMediaUpload.querySelector('input[type=file]').accept = isVideo ? 'video/*' : 'image/*';
+    postMediaUpload.querySelector('.admin-upload-text').innerHTML = isVideo
+      ? '📁 Glisse une vidéo ici, ou <strong>clique pour choisir</strong>'
+      : '📁 Glisse une image ici, ou <strong>clique pour choisir</strong>';
   }
   postTypeSelect.addEventListener('change', togglePostTypeFields);
 

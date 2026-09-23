@@ -9,9 +9,10 @@
     "create-admin": "node scripts/create-admin.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.19.2",
     "express-session": "^1.18.1",
-    "bcryptjs": "^2.4.3"
+    "multer": "^2.4.0"
   },
   "devDependencies": {
     "live-server": "^1.2.2"

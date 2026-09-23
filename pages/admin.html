@@ -229,11 +229,19 @@
         </label>
       </div>
       <label>Image (URL, ou nom de fichier dans assets/img/products/)
-        <input type="text" name="image">
+        <input type="text" name="image" id="productImageInput">
       </label>
+      <div class="admin-upload" data-upload-target="productImageInput" data-upload-kind="product-image">
+        <input type="file" accept="image/*" hidden>
+        <span class="admin-upload-text">📁 Glisse une image ici, ou <strong>clique pour choisir</strong></span>
+      </div>
       <label>Photos supplémentaires (optionnel — une URL par ligne)
-        <textarea name="images" rows="3" placeholder="https://...&#10;https://..."></textarea>
+        <textarea name="images" rows="3" id="productImagesInput" placeholder="https://...&#10;https://..."></textarea>
       </label>
+      <div class="admin-upload" data-upload-target="productImagesInput" data-upload-kind="product-image" data-upload-append="true">
+        <input type="file" accept="image/*" multiple hidden>
+        <span class="admin-upload-text">📁 Glisse une ou plusieurs images ici, ou <strong>clique pour choisir</strong></span>
+      </div>
       <p class="admin-hint">Si tu ajoutes au moins une photo ici, le client pourra faire défiler entre toutes les photos (celle du dessus incluse) en cliquant sur la photo du produit, côté site.</p>
       <label>Groupe de comparaison (optionnel)
         <input type="text" name="group" list="groupList">
@@ -293,8 +301,12 @@
       <label id="postMediaLabel">Image (URL, ou nom de fichier dans assets/img/posts/)
         <input type="text" name="media" id="postMediaInput">
       </label>
+      <div class="admin-upload" id="postMediaUpload" data-upload-target="postMediaInput" data-upload-kind="post-image">
+        <input type="file" accept="image/*" hidden>
+        <span class="admin-upload-text">📁 Glisse un fichier ici, ou <strong>clique pour choisir</strong></span>
+      </div>
       <div id="postVideoFields" hidden>
-        <p class="admin-hint">Colle un lien YouTube, ou le lien/nom de fichier d'une vidéo (.mp4) — exactement comme pour une photo ci-dessus.</p>
+        <p class="admin-hint">Colle un lien YouTube, ou envoie directement ta vidéo ci-dessus.</p>
         <label>Miniature (optionnel — auto-générée pour un lien YouTube, sinon affiche juste le bouton lecture)
           <input type="text" name="thumbnail">
         </label>
