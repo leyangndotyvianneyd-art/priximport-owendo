@@ -604,5 +604,34 @@
       }
     ],
     "total": 41300
+  },
+  {
+    "reference": "PIO-MUEEV5I2",
+    "date": "2026-09-23T18:02:54.749Z",
+    "customer": {
+      "name": "Leyang Ndoty Vianney",
+      "phone": "074132215",
+      "mode": "retrait",
+      "address": ""
+    },
+    "items": [
+      {
+        "id": "lait-poudre-900g",
+        "name": "Lait en poudre",
+        "price": 4200,
+        "unit": "Boîte 900g",
+        "image": "https://s.rfi.fr/media/display/4d37dbe0-127f-11ea-a592-005056a99247/w:1280/p:3x4/lait-en-poudre_1_0.jpg",
+        "qty": 1
+      },
+      {
+        "id": "eau-minerale-pack6",
+        "name": "Eau minérale",
+        "price": 1800,
+        "unit": "Pack de 6 x 1.5L",
+        "image": "https://c8.alamy.com/compfr/brhk64/l-eau-minerale-en-bouteille-pour-la-vente-dans-un-supermarche-empiles-sur-des-etageres-uk-brhk64.jpg",
+        "qty": 1
+      }
+    ],
+    "total": 6000
   }
 ]

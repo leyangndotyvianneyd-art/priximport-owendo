@@ -37,30 +37,7 @@
     "promo": false,
     "category": "Épicerie",
     "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpKG8NWEOPgIJN2kKWTNAW3hPwPNxpgPtPoyafNuPdYA&s=10",
-    "active": true,
-    "group": "farine"
-  },
-  {
-    "id": "farine-super-t45-1kg",
-    "name": "Farine Super T45",
-    "unit": "Paquet 1kg",
-    "price": 1300,
-    "promo": false,
-    "category": "Épicerie",
-    "image": "https://placehold.co/500x500/f4c430/1b4332?text=Farine+Super+T45",
-    "active": true,
-    "group": "farine"
-  },
-  {
-    "id": "farine-premium-5kg",
-    "name": "Farine Premium",
-    "unit": "Sac 5kg",
-    "price": 4800,
-    "promo": false,
-    "category": "Épicerie",
-    "image": "https://placehold.co/500x500/e8871e/ffffff?text=Farine+Premium+5kg",
-    "active": true,
-    "group": "farine"
+    "active": true
   },
   {
     "id": "lait-poudre-900g",
@@ -109,9 +86,6 @@
     "price": 2500,
     "category": "Fraîcheur & Local",
     "image": "https://c8.alamy.com/compfr/2y6ggme/italie-25-septembre-2024-poisson-congele-emballe-et-expose-dans-de-grandes-vitrines-refrigerees-pour-la-vente-dans-le-magasin-de-rabais-de-supermarche-italien-2y6ggme.jpg",
-    "images": [
-      "https://cdn.metro-online.com/-/media/Project/MCW/FR_Metro/Images/services-inspirations/metro/univers-produits/maree/OpenGraph/maree.jpg?rev=f0570d86879744ff8aed1a9ab6fcd066"
-    ],
     "active": true,
     "promo": false
   },
