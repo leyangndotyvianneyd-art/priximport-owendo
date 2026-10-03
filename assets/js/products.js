@@ -1,5 +1,9 @@
 // ===== PRIX IMPORT OWENDO — products.js =====
 // Charge data/products.json et affiche les produits sur la page catalogue.
+// Sert aussi aux pages "rayon" (ex. Cave à vin) : si la page définit
+// window.PRODUCTS_CATEGORY, seuls les produits de cette catégorie sont
+// affichés, et les boutons de filtre portent sur window.PRODUCTS_FILTER_FIELD
+// (ex. "wineType" : Rouge, Blanc...) au lieu de la catégorie.
 
 (function () {
 
@@ -14,8 +18,12 @@
   const urlCategory = params.get('category');
   const searchQuery = (params.get('q') || '').trim();
 
+  const fixedCategory = window.PRODUCTS_CATEGORY || null;
+  const filterField = window.PRODUCTS_FILTER_FIELD || 'category';
+  const filterOrder = window.PRODUCTS_FILTER_ORDER || null;
+
   let allProducts = [];
-  let activeCategory = urlCategory || 'Tous';
+  let activeCategory = (fixedCategory ? params.get(filterField) : urlCategory) || 'Tous';
 
   // Recherche simple, insensible aux accents et à la casse (permet de
   // trouver "crème" en tapant "creme", par ex.) — utilisée par le champ de
@@ -57,6 +65,10 @@
 
   function renderFilters(categories) {
     if (!filtersWrap) return;
+    if (!categories.length) {
+      filtersWrap.innerHTML = '';
+      return;
+    }
     const cats = ['Tous', ...categories];
     filtersWrap.innerHTML = cats.map(cat => `
       <button class="filter-btn${cat === activeCategory ? ' active' : ''}" data-category="${cat}">
@@ -91,17 +103,21 @@
   function renderProducts() {
     let filtered = activeCategory === 'Tous'
       ? allProducts
-      : allProducts.filter(p => p.category === activeCategory);
+      : allProducts.filter(p => p[filterField] === activeCategory);
 
     if (searchQuery) {
       const needle = normalize(searchQuery);
       filtered = filtered.filter(p =>
-        normalize(p.name).includes(needle) || normalize(p.category).includes(needle)
+        normalize(p.name).includes(needle) || normalize(p.category).includes(needle) ||
+        normalize(p[filterField] || '').includes(needle)
       );
     }
 
     if (filtered.length === 0) {
-      grid.innerHTML = `<p class="empty-state">${searchQuery ? 'Aucun produit ne correspond à votre recherche.' : 'Aucun produit dans cette catégorie pour le moment.'}</p>`;
+      const emptyMsg = searchQuery
+        ? 'Aucun produit ne correspond à votre recherche.'
+        : (fixedCategory && window.PRODUCTS_EMPTY_MESSAGE) || 'Aucun produit dans cette catégorie pour le moment.';
+      grid.innerHTML = `<p class="empty-state">${emptyMsg}</p>`;
       return;
     }
 
@@ -112,7 +128,7 @@
         ${promoActive ? '<span class="badge-promo">Promo</span>' : ''}
         <div class="product-image" style="background-image:url('${resolveImage(p.image)}')" data-zoom-id="${p.id}" role="button" tabindex="0" aria-label="Voir la photo de ${p.name} en grand"></div>
         <div class="product-body">
-          <p class="product-category">${p.category}</p>
+          <p class="product-category">${(fixedCategory && p[filterField]) || p.category}</p>
           <h3>${p.name}</h3>
           <div class="product-price">
             <span class="price">${formatPrice(p.price)}</span>
@@ -235,10 +251,22 @@
     }
 
     function closeLightbox() {
+      if (!lightbox.classList.contains('open')) return;
       lightbox.classList.remove('open');
       media.className = 'lightbox-media';
       media.innerHTML = '';
+      // Même principe que dans posts.js : la visionneuse invisible capte
+      // encore les clics un court instant pour qu'un toucher sur le ✕ ne
+      // traverse pas jusqu'au lien situé dessous.
+      lightbox.classList.add('closing');
+      clearTimeout(lightbox._closingTimer);
+      lightbox._closingTimer = setTimeout(() => lightbox.classList.remove('closing'), 400);
     }
+
+    // Le ✕ ferme dès qu'on relâche la souris (ou le doigt) dessus, même si
+    // elle a un peu bougé depuis l'appui (cas où un "click" est ignoré).
+    const closeBtn = lightbox.querySelector('.lightbox-close');
+    if (closeBtn) closeBtn.addEventListener('pointerup', closeLightbox);
 
     grid.addEventListener('click', (e) => {
       const el = e.target.closest('[data-zoom-id]');
@@ -254,8 +282,11 @@
       openProductLightbox(el.dataset.zoomId);
     });
 
+    // Ferme sur le ✕, sur le fond sombre, ou sur une photo simple agrandie
+    // (pas dans la galerie ni la comparaison, qui ont leurs propres clics).
     lightbox.addEventListener('click', (e) => {
-      if (e.target.closest('.lightbox-close') || e.target === lightbox) closeLightbox();
+      const onPhoto = media.classList.contains('is-image') && e.target.closest('.lightbox-media');
+      if (e.target.closest('.lightbox-close') || e.target === lightbox || onPhoto) closeLightbox();
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeLightbox();
@@ -271,8 +302,13 @@
       return res.json();
     })
     .then(products => {
-      allProducts = products.filter(p => p.active !== false);
-      const categories = [...new Set(allProducts.map(p => p.category))];
+      allProducts = products.filter(p => p.active !== false &&
+        (!fixedCategory || p.category === fixedCategory));
+      let categories = [...new Set(allProducts.map(p => p[filterField]).filter(Boolean))];
+      if (filterOrder) {
+        const rank = (c) => (filterOrder.includes(c) ? filterOrder.indexOf(c) : filterOrder.length);
+        categories.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b, 'fr'));
+      }
       if (activeCategory !== 'Tous' && !categories.includes(activeCategory)) {
         activeCategory = 'Tous';
       }

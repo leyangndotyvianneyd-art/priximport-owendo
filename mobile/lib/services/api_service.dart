@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/product.dart';
 import '../models/post.dart';
+import '../models/site_content.dart';
 
 /// Adresse du serveur Node (server.js) consommé par l'appli.
 ///
@@ -22,7 +23,16 @@ import '../models/post.dart';
 /// Le serveur (`npm start` dans le dossier du site) doit tourner pendant
 /// que tu testes l'appli.
 class ApiConfig {
-  static const String defaultBaseUrl = 'http://192.168.1.73:3000';
+  /// Adresse publique du serveur, fixée à la compilation de la version
+  /// grand public :
+  ///   flutter build apk --release --dart-define=API_URL=https://mon-site.com
+  /// Quand elle est fournie, l'appli l'utilise toujours et l'écran
+  /// "Réglages du serveur" est masqué (les clients n'ont pas à y toucher).
+  static const String publicUrl = String.fromEnvironment('API_URL');
+  static bool get isPublicBuild => publicUrl.isNotEmpty;
+
+  static const String defaultBaseUrl =
+      publicUrl != '' ? publicUrl : 'http://192.168.1.72:3000';
   static const String _prefsKey = 'server_base_url';
 
   static String _baseUrl = defaultBaseUrl;
@@ -32,11 +42,31 @@ class ApiConfig {
   /// À appeler une fois au démarrage de l'appli (avant runApp) pour
   /// recharger l'adresse enregistrée par l'utilisateur, si elle existe.
   static Future<void> init() async {
+    if (isPublicBuild) return;
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(_prefsKey);
     if (saved != null && saved.trim().isNotEmpty) {
       _baseUrl = saved.trim();
     }
+  }
+
+  /// Transforme un chemin relatif du serveur (ex. "assets/videos/x.mp4")
+  /// en URL complète — comme resolveAsset() dans assets/js/posts.js.
+  static String? resolveAsset(String? src) {
+    final s = src?.trim() ?? '';
+    if (s.isEmpty) return null;
+    if (RegExp(r'^https?://').hasMatch(s)) return s;
+    return '$_baseUrl/${s.replaceFirst(RegExp(r'^/+'), '')}';
+  }
+
+  /// Image produit : URL complète, ou simple nom de fichier rangé dans
+  /// assets/img/products/ — comme resolveImage() dans assets/js/products.js.
+  static String? resolveProductImage(String? image) {
+    final s = image?.trim() ?? '';
+    if (s.isEmpty) return null;
+    if (RegExp(r'^https?://').hasMatch(s)) return s;
+    if (s.startsWith('assets/')) return resolveAsset(s);
+    return '$_baseUrl/assets/img/products/$s';
   }
 
   /// Enregistre une nouvelle adresse serveur (persistée sur l'appareil) et
@@ -76,6 +106,26 @@ class ApiService {
         .toList();
   }
 
+  static SiteContent? _contentCache;
+
+  /// Dernier contenu chargé (pour les écrans qui en ont besoin tout de
+  /// suite, ex. numéro WhatsApp du panier). Null tant que rien n'est chargé.
+  static SiteContent? get cachedContent => _contentCache;
+
+  /// Contenu modifiable depuis l'admin (coordonnées, horaires, cartes).
+  /// Gardé en mémoire ; [refresh] force un nouveau chargement.
+  static Future<SiteContent> fetchContent({bool refresh = false}) async {
+    if (_contentCache != null && !refresh) return _contentCache!;
+    final res = await http
+        .get(_u('/api/content'))
+        .timeout(const Duration(seconds: 10));
+    if (res.statusCode != 200) {
+      throw Exception('Impossible de charger les informations du magasin.');
+    }
+    final Map<String, dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
+    return _contentCache = SiteContent.fromJson(data);
+  }
+
   static Future<List<Post>> fetchPosts() async {
     final res = await http
         .get(_u('/api/posts'))
@@ -103,8 +153,18 @@ class ApiService {
 
     final Map<String, dynamic> body = jsonDecode(utf8.decode(res.bodyBytes));
     if (res.statusCode != 200 || body['success'] != true) {
-      throw Exception(body['error'] ?? 'Erreur lors de la commande.');
+      throw OrderRejected(body['error']?.toString() ?? 'Erreur lors de la commande.');
     }
     return body;
   }
+}
+
+/// Le serveur a bien reçu la commande mais la refuse (produit retiré,
+/// quantité invalide...) — à distinguer d'une panne réseau.
+class OrderRejected implements Exception {
+  final String message;
+  OrderRejected(this.message);
+
+  @override
+  String toString() => message;
 }

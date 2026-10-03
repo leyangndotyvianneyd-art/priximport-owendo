@@ -3,30 +3,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/cart_badge_icon.dart';
+import '../widgets/content_builder.dart';
 
+/// Page Fraîcheur & local — cartes et note gérées depuis l'admin
+/// (onglet "Contenu du site"), comme pages/fraicheur.html.
 class FraicheurScreen extends StatelessWidget {
   const FraicheurScreen({super.key});
-
-  static const _items = [
-    (
-      'Producteurs locaux',
-      'Fruits et légumes livrés directement par nos producteurs partenaires '
-          "d'Owendo et des environs, plusieurs fois par semaine.",
-      Icons.agriculture_outlined,
-    ),
-    (
-      'Fraîcheur garantie',
-      'Rotation quotidienne des rayons frais : ce que vous trouvez en rayon '
-          'est arrivé dans la journée ou la veille.',
-      Icons.eco_outlined,
-    ),
-    (
-      'Prix justes',
-      "Des prix compétitifs toute l'année, sans marge excessive sur les "
-          'produits de première nécessité.',
-      Icons.sell_outlined,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -36,49 +18,69 @@ class FraicheurScreen extends StatelessWidget {
         actions: const [CartBadgeIcon(), SizedBox(width: 8)],
       ),
       drawer: const AppDrawer(current: 'fraicheur'),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Text(
-            "Le meilleur du frais, made in Owendo",
-            style: Theme.of(context).textTheme.displayMedium,
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            "Nous travaillons directement avec des producteurs locaux pour "
-            "vous garantir des produits frais, de qualité, à prix juste.",
-            style: TextStyle(color: AppColors.gray),
-          ),
-          const SizedBox(height: 20),
-          for (final item in _items)
-            Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+      body: ContentBuilder(
+        builder: (context, content) => ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text(
+              'Le meilleur du frais, made in Owendo',
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
+            const SizedBox(height: 20),
+            for (final card in content.fraicheurCards)
+              Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(card.iconData, color: AppColors.green, size: 28),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(card.title,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 15)),
+                            if (card.text.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(card.text,
+                                  style: const TextStyle(
+                                      color: AppColors.gray, fontSize: 13)),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            if (content.freshNote.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.yellow.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(AppTheme.radius),
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(item.$3, color: AppColors.green, size: 28),
-                    const SizedBox(width: 14),
+                    const Icon(Icons.info_outline, color: AppColors.green, size: 20),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(item.$1,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15)),
-                          const SizedBox(height: 4),
-                          Text(item.$2,
-                              style: const TextStyle(
-                                  color: AppColors.gray, fontSize: 13)),
-                        ],
-                      ),
+                      child: Text(content.freshNote,
+                          style: const TextStyle(fontSize: 13)),
                     ),
                   ],
                 ),
               ),
-            ),
-        ],
+            ],
+          ],
+        ),
       ),
     );
   }

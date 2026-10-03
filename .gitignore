@@ -2,3 +2,15 @@ node_modules/
 .DS_Store
 Thumbs.db
 .claude/
+# APK copié pour installation sur téléphone
+*.apk
+
+# Données privées : commandes clients et comptes admin (jamais dans Git)
+data/orders.json
+data/admins.json
+data/*.backup*.json
+
+# Fichiers de signature de l'appli Android (secrets)
+mobile/android/key.properties
+*.jks
+*.keystore

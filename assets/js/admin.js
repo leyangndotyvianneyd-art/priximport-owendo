@@ -188,6 +188,7 @@
       productForm.elements.image.value = product.image || '';
       productForm.elements.images.value = (product.images || []).join('\n');
       productForm.elements.group.value = product.group || '';
+      productForm.elements.wineType.value = product.wineType || '';
       productForm.elements.promo.checked = !!product.promo;
       productForm.elements.promoStart.value = product.promoStart || '';
       productForm.elements.promoEnd.value = product.promoEnd || '';
@@ -199,7 +200,8 @@
     }
     togglePromoDates();
     const categoryList = document.getElementById('categoryList');
-    categoryList.innerHTML = knownCategories.map((c) => `<option value="${escapeHtml(c)}">`).join('');
+    // "Cave à vin" toujours proposée, même avant la première bouteille.
+    categoryList.innerHTML = [...new Set([...knownCategories, 'Cave à vin'])].map((c) => `<option value="${escapeHtml(c)}">`).join('');
     const groupList = document.getElementById('groupList');
     groupList.innerHTML = knownGroups.map((g) => `<option value="${escapeHtml(g)}">`).join('');
     productModal.hidden = false;
@@ -232,6 +234,7 @@
       image: raw.image,
       images: raw.images ? raw.images.split('\n').map((s) => s.trim()).filter(Boolean) : [],
       group: raw.group || '',
+      wineType: raw.wineType || '',
       promo: isPromo,
       promoStart: isPromo ? raw.promoStart : '',
       promoEnd: isPromo ? raw.promoEnd : '',
@@ -642,6 +645,163 @@
     });
   }
 
+  // ---------------- Carrousel de l'accueil ----------------
+  // Réglages (vitesse + diapos automatiques) et diapos créées par l'admin,
+  // stockés dans content.json ("heroSlider") et lus par hero-slider.js.
+
+  const sliderSettingsForm = document.getElementById('sliderSettingsForm');
+  const sliderSettingsError = document.getElementById('sliderSettingsError');
+  const slidesTableBody = document.getElementById('slidesTableBody');
+  const slideModal = document.getElementById('slideModal');
+  const slideForm = document.getElementById('slideForm');
+  const slideFormError = document.getElementById('slideFormError');
+  const slideModalTitle = document.getElementById('slideModalTitle');
+  const slideLayoutSelect = document.getElementById('slideLayoutSelect');
+  const SLIDER_AUTO_KEYS = ['welcome', 'promo', 'fraicheur', 'nouveaute', 'services'];
+  const SLIDE_THEME_LABELS = { green: 'Vert', dark: 'Vert foncé', yellow: 'Jaune' };
+
+  function adminAsset(src) {
+    if (!src) return '';
+    return /^https?:\/\//.test(src) ? src : '../' + src;
+  }
+
+  function fillSliderSettings(slider) {
+    if (!sliderSettingsForm) return;
+    sliderSettingsForm.elements.delay.value = slider.delay || 6;
+    SLIDER_AUTO_KEYS.forEach((k) => {
+      sliderSettingsForm.elements[k].checked = !slider.auto || slider.auto[k] !== false;
+    });
+  }
+
+  if (sliderSettingsForm) {
+    sliderSettingsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      sliderSettingsError.hidden = true;
+      const auto = {};
+      SLIDER_AUTO_KEYS.forEach((k) => { auto[k] = sliderSettingsForm.elements[k].checked; });
+      const payload = { delay: Number(sliderSettingsForm.elements.delay.value), auto };
+      try {
+        await api('/api/admin/slider/settings', { method: 'PUT', body: JSON.stringify(payload) });
+        showToast('Réglages du carrousel enregistrés.');
+      } catch (err) {
+        sliderSettingsError.textContent = err.message;
+        sliderSettingsError.hidden = false;
+      }
+    });
+  }
+
+  // Affiche : image obligatoire, titre facultatif. Texte + photo : l'inverse.
+  function syncSlideLayoutFields() {
+    const poster = slideLayoutSelect.value === 'poster';
+    document.getElementById('slideImageLabel').firstChild.textContent = poster ? 'Image * ' : 'Photo (facultative) ';
+    document.getElementById('slideTitleLabel').firstChild.textContent = poster ? 'Titre (facultatif) ' : 'Titre * ';
+    document.getElementById('slidePosterHint').hidden = !poster;
+    slideForm.elements.title.required = !poster;
+    slideForm.elements.image.required = poster;
+  }
+
+  function openSlideModal(slide) {
+    if (!slideModal) return;
+    slideForm.reset();
+    slideFormError.hidden = true;
+    if (slide) {
+      slideModalTitle.textContent = 'Modifier la diapositive';
+      ['id', 'layout', 'theme', 'eyebrow', 'title', 'text', 'image', 'ctaLabel', 'ctaHref'].forEach((k) => {
+        slideForm.elements[k].value = slide[k] || '';
+      });
+      slideForm.elements.layout.value = slide.layout || 'split';
+      slideForm.elements.theme.value = slide.theme || 'green';
+      slideForm.elements.active.checked = slide.active !== false;
+    } else {
+      slideModalTitle.textContent = 'Ajouter une diapositive';
+      slideForm.elements.id.value = '';
+      slideForm.elements.active.checked = true;
+    }
+    syncSlideLayoutFields();
+    slideModal.hidden = false;
+  }
+
+  if (slideForm) {
+    slideLayoutSelect.addEventListener('change', syncSlideLayoutFields);
+    document.getElementById('btnNewSlide').addEventListener('click', () => openSlideModal(null));
+    document.getElementById('btnCancelSlide').addEventListener('click', () => { slideModal.hidden = true; });
+    slideForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      slideFormError.hidden = true;
+      const raw = Object.fromEntries(new FormData(slideForm));
+      const payload = {
+        layout: raw.layout, theme: raw.theme, eyebrow: raw.eyebrow, title: raw.title, text: raw.text,
+        image: raw.image, ctaLabel: raw.ctaLabel, ctaHref: raw.ctaHref,
+        active: slideForm.elements.active.checked
+      };
+      try {
+        if (raw.id) {
+          await api('/api/admin/slider/slides/' + encodeURIComponent(raw.id), { method: 'PUT', body: JSON.stringify(payload) });
+          showToast('Diapositive mise à jour.');
+        } else {
+          await api('/api/admin/slider/slides', { method: 'POST', body: JSON.stringify(payload) });
+          showToast('Diapositive ajoutée.');
+        }
+        slideModal.hidden = true;
+        loadContent();
+      } catch (err) {
+        slideFormError.textContent = err.message;
+        slideFormError.hidden = false;
+      }
+    });
+  }
+
+  function renderSlidesTable(slides) {
+    if (!slidesTableBody) return;
+    slidesTableBody.innerHTML = slides.map((s, i) => {
+      const img = adminAsset(s.image);
+      const thumb = `<div class="admin-slide-thumb theme-${escapeHtml(s.theme || 'green')}"${img ? ` style="background-image:url('${escapeHtml(img)}')"` : ''}>${img ? '' : escapeHtml(s.title)}</div>`;
+      return `
+        <tr>
+          <td>${thumb}</td>
+          <td>
+            <strong>${escapeHtml(s.title || '(sans titre)')}</strong><br>
+            <span class="admin-muted">${s.layout === 'poster' ? 'Affiche' : 'Texte + photo'} · ${SLIDE_THEME_LABELS[s.theme] || 'Vert'}${s.ctaHref ? ' · → ' + escapeHtml(s.ctaHref) : ''}</span>
+          </td>
+          <td>${s.active === false ? '<span class="admin-badge admin-badge-off">Masquée</span>' : '<span class="admin-badge admin-badge-on">Visible</span>'}</td>
+          <td class="admin-row-actions">
+            <button type="button" class="btn btn-outline btn-sm" data-move-slide="${escapeHtml(s.id)}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button>
+            <button type="button" class="btn btn-outline btn-sm" data-move-slide="${escapeHtml(s.id)}" data-dir="1" ${i === slides.length - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button>
+            <button type="button" class="btn btn-outline btn-sm" data-edit-slide="${escapeHtml(s.id)}">Modifier</button>
+            <button type="button" class="btn btn-outline btn-sm admin-btn-danger" data-delete-slide="${escapeHtml(s.id)}">Supprimer</button>
+          </td>
+        </tr>`;
+    }).join('') || '<tr><td colspan="4" class="admin-muted">Aucune diapositive personnalisée : seules les diapositives automatiques s\'affichent.</td></tr>';
+
+    slidesTableBody.querySelectorAll('[data-edit-slide]').forEach((btn) => {
+      btn.addEventListener('click', () => openSlideModal(slides.find((s) => s.id === btn.dataset.editSlide)));
+    });
+    slidesTableBody.querySelectorAll('[data-move-slide]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        try {
+          await api('/api/admin/slider/slides/' + encodeURIComponent(btn.dataset.moveSlide) + '/move', {
+            method: 'POST', body: JSON.stringify({ dir: Number(btn.dataset.dir) })
+          });
+          loadContent();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+    slidesTableBody.querySelectorAll('[data-delete-slide]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer cette diapositive ?')) return;
+        try {
+          await api('/api/admin/slider/slides/' + encodeURIComponent(btn.dataset.deleteSlide), { method: 'DELETE' });
+          showToast('Diapositive supprimée.');
+          loadContent();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  }
+
   async function loadContent() {
     if (!fieldsForm) return; // pas d'onglet "Contenu du site" sur cette page
     const content = await api('/api/content');
@@ -651,6 +811,9 @@
     renderCardsTable('home', cards.home);
     renderCardsTable('fraicheur', cards.fraicheur);
     renderCardsTable('services', cards.services);
+    const slider = content.heroSlider || {};
+    fillSliderSettings(slider);
+    renderSlidesTable(Array.isArray(slider.slides) ? slider.slides : []);
   }
 
   function loadAll() {

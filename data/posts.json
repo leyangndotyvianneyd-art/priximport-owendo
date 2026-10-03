@@ -53,5 +53,225 @@
     "tag": "Réassort",
     "date": "2026-08-10",
     "media": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=800"
+  },
+  {
+    "id": "test-video-01",
+    "type": "video",
+    "title": "Vidéo de test 1",
+    "caption": "Vidéo de test (1:09) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-07f0ef225a73427e9146f9c5a076a005.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-02",
+    "type": "video",
+    "title": "Vidéo de test 2",
+    "caption": "Vidéo de test (0:12) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-22",
+    "media": "assets/videos/tiktok-448974f2b90037432f50836909a22377.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-03",
+    "type": "video",
+    "title": "Vidéo de test 3",
+    "caption": "Vidéo de test (0:29) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-22",
+    "media": "assets/videos/tiktok-44db6c31c3a925553ae04dd1f49f8776.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-04",
+    "type": "video",
+    "title": "Vidéo de test 4",
+    "caption": "Vidéo de test (0:43) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-4fd5ccf15b676b590d510cde972e8346.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-05",
+    "type": "video",
+    "title": "Vidéo de test 5",
+    "caption": "Vidéo de test (1:30) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-575dedc3cf20c33d529843457882f067.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-06",
+    "type": "video",
+    "title": "Vidéo de test 6",
+    "caption": "Vidéo de test (1:17) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-5a1f68771f19eeab8525357506f36cf7.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-07",
+    "type": "video",
+    "title": "Vidéo de test 7",
+    "caption": "Vidéo de test (19:20) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-7676792478917233938.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-08",
+    "type": "video",
+    "title": "Vidéo de test 8",
+    "caption": "Vidéo de test (1:03) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-7687251926777384225.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-09",
+    "type": "video",
+    "title": "Vidéo de test 9",
+    "caption": "Vidéo de test (5:22) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-7688051843183709471.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-10",
+    "type": "video",
+    "title": "Vidéo de test 10",
+    "caption": "Vidéo de test (1:33) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-7688499461441555744.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-11",
+    "type": "video",
+    "title": "Vidéo de test 11",
+    "caption": "Vidéo de test (0:26) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-22",
+    "media": "assets/videos/tiktok-794b5343653b17c69c993c72d0dea446.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-12",
+    "type": "video",
+    "title": "Vidéo de test 12",
+    "caption": "Vidéo de test (0:59) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-22",
+    "media": "assets/videos/tiktok-7e779c1284e2b1b2e94dbffd0764148f.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-13",
+    "type": "video",
+    "title": "Vidéo de test 13",
+    "caption": "Vidéo de test (1:13) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-a20a16253fa8a4b551e840748b51b0ef.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-14",
+    "type": "video",
+    "title": "Vidéo de test 14",
+    "caption": "Vidéo de test (1:14) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-a51dc5a7c12d06397e21d46f2fc74290.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-15",
+    "type": "video",
+    "title": "Vidéo de test 15",
+    "caption": "Vidéo de test (4:12) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-a94bac808136e46a66cc02b719dbee4d.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-16",
+    "type": "video",
+    "title": "Vidéo de test 16",
+    "caption": "Vidéo de test (0:44) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-ad1a2cc307a5a9dd3fbeda0177693435.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-17",
+    "type": "video",
+    "title": "Vidéo de test 17",
+    "caption": "Vidéo de test (0:48) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-bac263e53053e918247e3fac45f14ecf.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-18",
+    "type": "video",
+    "title": "Vidéo de test 18",
+    "caption": "Vidéo de test (4:00) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-bba6b89d12b748c7d9c2215d1f98d6dd.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-19",
+    "type": "video",
+    "title": "Vidéo de test 19",
+    "caption": "Vidéo de test (1:44) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-bbc494ecaeceb8fbc536376eac5d8eae.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-20",
+    "type": "video",
+    "title": "Vidéo de test 20",
+    "caption": "Vidéo de test (1:09) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-22",
+    "media": "assets/videos/tiktok-c0de314cf3d9d048cfaaf70e410812a3.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-21",
+    "type": "video",
+    "title": "Vidéo de test 21",
+    "caption": "Vidéo de test (1:08) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-dd2bebdab95fd66813b9df8d9f72b20a.mp4",
+    "test": true
+  },
+  {
+    "id": "test-video-22",
+    "type": "video",
+    "title": "Vidéo de test 22",
+    "caption": "Vidéo de test (3:18) — à retirer avant la mise en ligne.",
+    "tag": "Test",
+    "date": "2026-09-25",
+    "media": "assets/videos/tiktok-fb935e612499a99b2725e51d86ef21fc.mp4",
+    "test": true
   }
 ]

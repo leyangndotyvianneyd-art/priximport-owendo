@@ -1,7 +1,7 @@
 name: priximport_owendo_mobile
 description: Application mobile PRIX IMPORT OWENDO - catalogue et commande en ligne.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.6.0+7
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -15,11 +15,23 @@ dependencies:
   url_launcher: ^6.3.0
   intl: ^0.19.0
   shared_preferences: ^2.3.2
+  video_player: ^2.14.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
+
+# Icône de l'appli (logo Prix Import) — régénérer avec :
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/icon.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/icon/icon-foreground.png
+  remove_alpha_ios: true

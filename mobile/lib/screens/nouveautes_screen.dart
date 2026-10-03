@@ -6,7 +6,9 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/cart_badge_icon.dart';
+import '../widgets/image_viewer.dart';
 import 'settings_screen.dart';
+import 'video_player_screen.dart';
 
 class NouveautesScreen extends StatefulWidget {
   const NouveautesScreen({super.key});
@@ -32,14 +34,24 @@ class _NouveautesScreenState extends State<NouveautesScreen> {
     await _future;
   }
 
-  Future<void> _openVideo(Post post) async {
-    Uri? uri;
-    if (post.youtube != null && post.youtube!.isNotEmpty) {
-      uri = Uri.parse('https://www.youtube.com/watch?v=${post.youtube}');
-    } else if (post.media != null && post.media!.isNotEmpty) {
-      uri = Uri.parse(post.media!);
+  Future<void> _openPost(Post post) async {
+    if (!post.isVideo) {
+      final url = post.photoUrl;
+      if (url != null) openImageViewer(context, url, title: post.title);
+      return;
     }
-    if (uri == null) return;
+    // Vidéo maison : lecture directement dans l'appli.
+    final videoUrl = post.videoUrl;
+    if (videoUrl != null) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => VideoPlayerScreen(url: videoUrl, title: post.title),
+      ));
+      return;
+    }
+    // Vidéo YouTube : ouverture dans l'appli YouTube (ou le navigateur).
+    final yt = post.youtubeId;
+    if (yt == null) return;
+    final uri = Uri.parse('https://www.youtube.com/watch?v=$yt');
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +86,7 @@ class _NouveautesScreenState extends State<NouveautesScreen> {
                     const SizedBox(height: 12),
                     const Text(
                       'Impossible de charger les publications.\n'
-                      'Vérifie la connexion au serveur.',
+                      'Vérifie ta connexion Internet puis réessaie.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: AppColors.gray),
                     ),
@@ -84,6 +96,7 @@ class _NouveautesScreenState extends State<NouveautesScreen> {
                       alignment: WrapAlignment.center,
                       children: [
                         ElevatedButton(onPressed: _reload, child: const Text('Réessayer')),
+                        if (!ApiConfig.isPublicBuild)
                         OutlinedButton(
                           onPressed: () async {
                             final changed = await Navigator.of(context).push<bool>(
@@ -127,7 +140,7 @@ class _NouveautesScreenState extends State<NouveautesScreen> {
                         itemCount: filtered.length,
                         itemBuilder: (context, i) => _PostCard(
                           post: filtered[i],
-                          onOpenVideo: () => _openVideo(filtered[i]),
+                          onOpen: () => _openPost(filtered[i]),
                         ),
                       ),
               ),
@@ -155,9 +168,9 @@ class _NouveautesScreenState extends State<NouveautesScreen> {
 
 class _PostCard extends StatelessWidget {
   final Post post;
-  final VoidCallback onOpenVideo;
+  final VoidCallback onOpen;
 
-  const _PostCard({required this.post, required this.onOpenVideo});
+  const _PostCard({required this.post, required this.onOpen});
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +178,7 @@ class _PostCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 14),
       child: InkWell(
-        onTap: post.isVideo ? onOpenVideo : null,
+        onTap: onOpen,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -181,7 +194,12 @@ class _PostCard extends StatelessWidget {
                           errorBuilder: (_, __, ___) =>
                               Container(color: AppColors.grayLight),
                         )
-                      : Container(color: AppColors.grayLight),
+                      : Container(
+                          // Vidéo envoyée sans miniature.
+                          color: AppColors.ink,
+                          child: const Icon(Icons.movie_outlined,
+                              color: Colors.white24, size: 48),
+                        ),
                 ),
                 if (post.isVideo)
                   Container(

@@ -51,8 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const ytId = detectYoutubeId(source);
       const videoRef = ytId ? `yt:${ytId}` : resolveAsset(source);
       const thumb = post.thumbnail ? resolveAsset(post.thumbnail) : (ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : '');
+      // Vidéo envoyée sans miniature : on affiche une image tirée de la
+      // vidéo elle-même (chargée seulement quand la carte arrive à l'écran,
+      // voir loadVideoFrames) plutôt qu'une case vide.
+      const frame = !thumb && !ytId && videoRef
+        ? `<video class="post-media-frame" data-frame-src="${videoRef}#t=1" muted playsinline preload="none" aria-hidden="true"></video>`
+        : '';
       media = `<div class="post-media" data-video="${videoRef}" role="button" tabindex="0" aria-label="Lire la vidéo « ${post.title} »">
-                 ${thumb ? `<img src="${thumb}" alt="${post.title}" loading="lazy">` : ''}
+                 ${thumb ? `<img src="${thumb}" alt="${post.title}" loading="lazy">` : frame}
                  <span class="play"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="26" fill="#F4C430"/><path d="M21 16l16 10-16 10V16Z" fill="#241C15"/></svg></span>
                </div>`;
     } else {
@@ -74,10 +80,70 @@ document.addEventListener('DOMContentLoaded', () => {
       </article>`;
   }
 
+  // Charge l'image des vidéos sans miniature seulement quand elles
+  // approchent de l'écran — sinon la page téléchargerait toutes les vidéos
+  // d'un coup.
+  //
+  // Une fois l'image obtenue, on la copie dans une simple <img> et on libère
+  // le lecteur vidéo : garder des dizaines de lecteurs ouverts pour de
+  // simples vignettes alourdissait la page (clics lents, notamment sur le ✕
+  // de la visionneuse).
+  function frameToImage(video) {
+    try {
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, 480 / (video.videoWidth || 480));
+      canvas.width = Math.round((video.videoWidth || 480) * scale);
+      canvas.height = Math.round((video.videoHeight || 270) * scale);
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      const img = document.createElement('img');
+      img.className = 'post-media-frame';
+      img.alt = '';
+      img.src = canvas.toDataURL('image/jpeg', 0.8);
+      video.replaceWith(img);
+    } catch (e) {
+      return; // image impossible à copier : on garde le lecteur tel quel
+    }
+    video.removeAttribute('src');
+    video.load();
+  }
+
+  // On prend l'image à 1 seconde (la toute première image d'une vidéo est
+  // souvent noire).
+  function startFrame(video) {
+    video.addEventListener('loadeddata', () => {
+      if (video.currentTime < 0.5 && video.duration > 1) {
+        video.addEventListener('seeked', () => frameToImage(video), { once: true });
+        video.currentTime = 1;
+      } else {
+        frameToImage(video);
+      }
+    }, { once: true });
+    video.preload = 'auto';
+    video.src = video.dataset.frameSrc.replace(/#t=[\d.]+$/, '');
+  }
+
+  const frameObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          frameObserver.unobserve(entry.target);
+          startFrame(entry.target);
+        });
+      }, { rootMargin: '200px' })
+    : null;
+
+  function loadVideoFrames() {
+    grid.querySelectorAll('video[data-frame-src]:not([src])').forEach((video) => {
+      if (frameObserver) frameObserver.observe(video);
+      else startFrame(video);
+    });
+  }
+
   function render(items) {
     grid.innerHTML = items.length
       ? items.map(cardHTML).join('')
       : `<div class="posts-empty">Aucune publication pour ce filtre.</div>`;
+    loadVideoFrames();
   }
 
   fetch(base + 'data/posts.json')
@@ -110,10 +176,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lightbox) {
     const media = lightbox.querySelector('.lightbox-media');
 
+    // Vidéo YouTube : cadre 16:9. Vidéo envoyée (souvent verticale, format
+    // téléphone) : le lecteur prend la forme exacte de la vidéo, sans bandes
+    // noires — un clic à côté de la vidéo tombe alors sur le fond sombre et
+    // ferme la visionneuse, au lieu de mettre la vidéo en pause.
     function openVideoLightbox(src) {
-      media.innerHTML = src.startsWith('yt:')
+      const isYoutube = src.startsWith('yt:');
+      media.className = 'lightbox-media' + (isYoutube ? '' : ' is-video');
+      media.innerHTML = isYoutube
         ? `<iframe src="https://www.youtube.com/embed/${src.slice(3)}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
-        : `<video src="${src}" controls autoplay></video>`;
+        : `<video src="${src}" controls autoplay playsinline></video>`;
       lightbox.classList.add('open');
     }
 
@@ -135,19 +207,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function openImageLightbox(src, name) {
-      media.classList.add('is-image');
+      media.className = 'lightbox-media is-image';
       media.innerHTML = `<img src="${src}" alt="${name}">`;
       lightbox.classList.add('open');
     }
 
     function closeLightbox() {
+      if (!lightbox.classList.contains('open')) return;
       lightbox.classList.remove('open');
-      media.classList.remove('is-image');
+      media.className = 'lightbox-media';
       media.innerHTML = '';
+      // La visionneuse (invisible) capte encore les clics un court instant :
+      // sur mobile, le "clic" qui suit le relâchement du doigt ne doit pas
+      // traverser jusqu'au lien situé sous le ✕.
+      lightbox.classList.add('closing');
+      clearTimeout(lightbox._closingTimer);
+      lightbox._closingTimer = setTimeout(() => lightbox.classList.remove('closing'), 400);
     }
 
+    // Le ✕ ferme dès qu'on relâche la souris (ou le doigt) dessus : un
+    // "click" classique est ignoré par le navigateur si la souris a bougé
+    // entre l'appui et le relâchement, ce qui arrivait souvent.
+    const closeBtn = lightbox.querySelector('.lightbox-close');
+    if (closeBtn) closeBtn.addEventListener('pointerup', closeLightbox);
+
+    // Ferme aussi sur le fond sombre, ou sur la photo agrandie elle-même.
     lightbox.addEventListener('click', (e) => {
-      if (e.target.closest('.lightbox-close') || e.target === lightbox) closeLightbox();
+      const onPhoto = media.classList.contains('is-image') && e.target.closest('.lightbox-media');
+      if (e.target.closest('.lightbox-close') || e.target === lightbox || e.target === media || onPhoto) closeLightbox();
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeLightbox();

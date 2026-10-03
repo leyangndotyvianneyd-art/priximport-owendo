@@ -122,6 +122,22 @@ une valeur par défaut est utilisée dans `server.js`, ligne
 `SESSION_SECRET`), pour que personne ne puisse deviner les sessions
 administrateur.
 
+## Carrousel de la page d'accueil
+
+Le grand bandeau qui défile en haut de l'accueil se gère dans l'onglet
+**Carrousel** de `pages/admin.html` :
+- **Réglages** : durée d'affichage de chaque diapositive, et choix des
+  diapositives automatiques à garder (bienvenue, promotions, fraîcheur,
+  dernière nouveauté, livraison & Mobile Money). Ces dernières se remplissent
+  toutes seules à partir du catalogue et des Nouveautés.
+- **Mes diapositives** : tes propres diapositives, soit en *affiche* (une
+  image sur toute la largeur, format paysage ~1600 × 600 conseillé), soit en
+  *texte + photo*. Elles s'affichent juste après la bienvenue, dans l'ordre
+  choisi avec les flèches ↑ ↓. Les images envoyées vont dans
+  `assets/img/slides/`.
+
+Tout est enregistré dans `data/content.json` (clé `heroSlider`).
+
 ## Où sont enregistrées les commandes ?
 
 Dans `data/orders.json`, uniquement quand le site tourne via `npm start`

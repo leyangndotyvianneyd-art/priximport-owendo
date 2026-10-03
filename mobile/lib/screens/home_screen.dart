@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/cart_badge_icon.dart';
+import '../widgets/home_slider.dart';
 import 'catalogue_screen.dart';
 import 'fraicheur_screen.dart';
+import 'cave_screen.dart';
 import 'nouveautes_screen.dart';
 import 'services_screen.dart';
-import 'localisation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,61 +24,8 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.green, AppColors.greenDark],
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Vos courses,\nau meilleur prix.',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    height: 1.15,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Le supermarché de référence à Owendo : épicerie, produits '
-                  'frais et locaux, à retirer en magasin ou livrés chez vous.',
-                  style: TextStyle(color: Colors.white70, fontSize: 14.5),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (_) => const CatalogueScreen()),
-                      ),
-                      child: const Text('Voir le catalogue'),
-                    ),
-                    const SizedBox(width: 10),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white70),
-                      ),
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (_) => const LocalisationScreen()),
-                      ),
-                      child: const Text('Nous trouver'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          // Carrousel (diapos réglables dans l'admin, onglet « Carrousel »)
+          const HomeSlider(),
           Padding(
             padding: const EdgeInsets.all(20),
             child: GridView.count(
@@ -102,6 +50,14 @@ class HomeScreen extends StatelessWidget {
                   subtitle: 'Produits locaux',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const FraicheurScreen()),
+                  ),
+                ),
+                _HighlightCard(
+                  icon: Icons.wine_bar_outlined,
+                  title: 'Cave à vin',
+                  subtitle: 'Vins & spiritueux',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const CaveScreen()),
                   ),
                 ),
                 _HighlightCard(

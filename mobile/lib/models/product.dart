@@ -1,3 +1,5 @@
+import '../services/api_service.dart';
+
 /// Modèle produit — mêmes champs que data/products.json côté serveur,
 /// pour rester compatible avec le catalogue déjà utilisé par le site web.
 class Product {
@@ -10,6 +12,10 @@ class Product {
   final String? promoStart;
   final String? promoEnd;
   final String category;
+
+  /// Type de vin (Rouge, Blanc...) pour les produits de la catégorie
+  /// "Cave à vin" — sert aux filtres de l'écran Cave à vin.
+  final String? wineType;
   final String image;
   final bool active;
 
@@ -23,9 +29,13 @@ class Product {
     this.promoStart,
     this.promoEnd,
     required this.category,
+    this.wineType,
     required this.image,
     this.active = true,
   });
+
+  /// URL complète de l'image (le serveur peut ne stocker qu'un nom de fichier).
+  String? get imageUrl => ApiConfig.resolveProductImage(image);
 
   /// Un produit "en promo" avec des dates de début/fin n'affiche le badge
   /// promo et l'ancien prix barré que pendant cette période — comme sur le
@@ -60,6 +70,7 @@ class Product {
       promoStart: json['promoStart']?.toString(),
       promoEnd: json['promoEnd']?.toString(),
       category: json['category']?.toString() ?? 'Divers',
+      wineType: json['wineType']?.toString(),
       image: json['image']?.toString() ?? '',
       active: json['active'] != false,
     );

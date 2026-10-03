@@ -79,6 +79,16 @@ img { max-width: 100%; display: block; }
   box-shadow: 0 10px 22px rgba(232, 135, 30, 0.45);
 }
 .btn-primary:active { transform: translateY(0); }
+/* Même principe que .product-card::after : le bouton remonte de 2px au
+   survol, cette bande évite qu'il "fuie" sous la souris posée sur son bord. */
+.btn-primary { position: relative; }
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 100%;
+  height: 4px;
+}
 
 .btn-outline {
   background: transparent;
@@ -136,6 +146,78 @@ header {
   flex-wrap: wrap;
 }
 
+/* ===== Photos qui défilent en fond du header (assets/js/header-slideshow.js) =====
+   Le fond couvre tout le header : la ligne logo + recherche ET la ligne des
+   onglets. Deux calques de photo en fondu enchaîné, un léger zoom lent, et
+   un voile vert foncé par-dessus pour que le logo, la recherche, les icônes
+   et les onglets restent lisibles quelle que soit la photo. */
+header.has-bg {
+  isolation: isolate;
+  background: var(--green-dark);
+}
+header.has-bg > :not(.header-bg) { position: relative; z-index: 1; }
+.header-main-inner { transition: padding 0.3s ease; }
+/* Bande photo haute en haut de page, qui redevient compacte dès qu'on
+   fait défiler (classe "scrolled" posée par main.js) pour que l'en-tête,
+   toujours visible, ne prenne pas trop de place. */
+header.has-bg > .header-main-inner { padding-top: 56px; padding-bottom: 40px; }
+header.has-bg.scrolled > .header-main-inner { padding-top: 16px; padding-bottom: 12px; }
+@media (max-width: 700px) {
+  header.has-bg > .header-main-inner { padding-top: 36px; padding-bottom: 28px; }
+  header.has-bg.scrolled > .header-main-inner { padding-top: 12px; padding-bottom: 12px; }
+}
+.header-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+header.has-bg .header-bg { opacity: 1; }
+.header-bg-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--green-dark) center / cover no-repeat;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.header-bg-layer.is-visible {
+  opacity: 1;
+  animation: header-bg-zoom 9s ease-out forwards;
+}
+@keyframes header-bg-zoom {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+/* Voile : plus sombre sur les côtés (logo, icônes) et en bas (onglets),
+   plus léger au centre pour laisser voir la photo. */
+.header-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, rgba(16, 40, 30, 0.7) 0%, rgba(16, 40, 30, 0.35) 30%, rgba(16, 40, 30, 0) 55%),
+    linear-gradient(90deg, rgba(16, 40, 30, 0.82) 0%, rgba(16, 40, 30, 0.45) 22%, rgba(16, 40, 30, 0.25) 50%, rgba(16, 40, 30, 0.45) 78%, rgba(16, 40, 30, 0.8) 100%);
+}
+header.has-bg .logo-text .l1 { color: var(--white); }
+header.has-bg .logo-text .l2 { color: var(--yellow); }
+header.has-bg .logo-text { text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); }
+header.has-bg .header-icon-link { color: var(--white); filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7)); }
+header.has-bg .header-icon-link:hover { background: rgba(255, 255, 255, 0.14); }
+/* Ligne des onglets, transparente sur la photo */
+header.has-bg .nav-secondary {
+  background: transparent;
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+header.has-bg .nav-links > li > a {
+  color: var(--white);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+}
+header.has-bg .cat-dropdown-btn { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+@media (prefers-reduced-motion: reduce) {
+  .header-bg-layer, .header-bg-layer.is-visible { transition: none; animation: none; }
+}
 /* ===== Barre de recherche du header ===== */
 .header-search {
   flex: 1 1 320px;
@@ -249,7 +331,7 @@ header {
   z-index: 150;
 }
 .cat-dropdown.open .cat-dropdown-panel { display: block; }
-.cat-dropdown-panel a {
+.cat-dropdown-panel a[data-cat] {
   display: block;
   padding: 10px 12px;
   border-radius: 8px;
@@ -257,8 +339,64 @@ header {
   font-weight: 500;
   color: var(--ink);
 }
-.cat-dropdown-panel a:hover { background: var(--cream); color: var(--green-dark); }
+.cat-dropdown-panel a[data-cat]:hover,
+.cat-dropdown-panel a[data-cat].is-active { background: var(--cream); color: var(--green-dark); }
 .cat-dropdown-panel .empty { padding: 10px 12px; color: var(--gray); font-size: 0.85rem; }
+
+/* ===== Aperçu des catégories (assets/js/categories.js) =====
+   Menu "Toutes les catégories" : liste à gauche, aperçu de la catégorie
+   survolée à droite. Sidebar de l'accueil : volet qui s'ouvre à droite. */
+.cat-dropdown.open .cat-dropdown-panel.has-preview {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 10px;
+  width: min(820px, calc(100vw - 48px));
+  max-height: none;
+  overflow: visible;
+}
+.cat-list { display: flex; flex-direction: column; border-right: 1px solid var(--gray-light); padding-right: 10px; }
+.cat-preview,
+.cat-flyout { padding: 8px 10px 10px; min-width: 0; }
+.cat-preview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.cat-preview-head h4 { font-family: 'Anton', sans-serif; font-size: 1.25rem; color: var(--green-dark); font-weight: 400; }
+.cat-preview-head p { font-size: 0.82rem; color: var(--gray); }
+.cat-preview-head .see-all { font-weight: 600; font-size: 0.88rem; color: var(--orange); white-space: nowrap; }
+.cat-preview-head .see-all:hover { text-decoration: underline; }
+.cat-preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+
+.home-sidebar { z-index: 20; }
+.cat-flyout {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 12px);
+  width: 580px;
+  min-height: 100%;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 18px;
+}
+/* "Pont" invisible entre la sidebar et le volet */
+.cat-flyout::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 100%;
+  width: 14px;
+}
+@media (max-width: 1100px) {
+  .cat-flyout { width: 440px; }
+  .cat-flyout .cat-preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .cat-flyout { display: none; }
+}
 
 .logo {
   display: flex;
@@ -266,7 +404,7 @@ header {
   gap: 10px;
   flex-shrink: 0;
 }
-.logo-mark { width: 40px; height: 40px; flex-shrink: 0; }
+.logo-mark { width: 48px; height: 48px; flex-shrink: 0; object-fit: contain; }
 .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
 .logo-text .l1 {
   font-family: 'Anton', sans-serif;
@@ -287,14 +425,14 @@ header {
   gap: 26px;
   list-style: none;
 }
-.nav-links a {
+.nav-links > li > a {
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--ink);
   position: relative;
   padding-bottom: 4px;
 }
-.nav-links a::after {
+.nav-links > li > a::after {
   content: '';
   position: absolute;
   left: 0; bottom: 0;
@@ -302,8 +440,193 @@ header {
   background: var(--orange);
   transition: width 0.2s ease;
 }
-.nav-links a:hover::after,
-.nav-links a[aria-current="page"]::after { width: 100%; }
+.nav-links > li > a:hover::after,
+.nav-links > li > a[aria-current="page"]::after { width: 100%; }
+
+/* ===== Aperçu au survol des onglets (assets/js/nav-preview.js) =====
+   Le panneau est dans le <li> de l'onglet (pour que le survol reste actif
+   quand la souris descend dedans), mais positionné par rapport à toute la
+   barre .nav-secondary pour prendre sa largeur. Petit délai à l'ouverture
+   pour ne pas clignoter quand on balaie le menu. */
+.nav-secondary { position: relative; }
+.nav-preview {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 140;
+  background: var(--white);
+  border-top: 1px solid var(--gray-light);
+  box-shadow: var(--shadow-lg);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+/* "Pont" invisible entre le lien et le panneau */
+.nav-preview::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 100%;
+  height: 14px;
+}
+.nav-links li.has-preview:hover > .nav-preview,
+.nav-links li.has-preview:focus-within > .nav-preview {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.18s ease 0.12s, transform 0.18s ease 0.12s, visibility 0s linear 0.12s;
+}
+.nav-links li.has-preview.np-dismissed > .nav-preview { visibility: hidden; opacity: 0; }
+
+.nav-preview-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 26px 24px 28px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 36px;
+}
+.np-intro { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.np-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+.nav-preview h3 { font-size: 1.5rem; }
+.np-text { color: var(--gray); font-size: 0.9rem; }
+.np-intro .btn { margin-top: 6px; }
+.np-body { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.np-empty { color: var(--gray); font-size: 0.9rem; }
+
+/* Mini-fiches produits et publications */
+.np-products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.np-posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.np-product,
+.np-post {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+.np-product:hover,
+.np-post:hover { background: var(--cream); }
+.np-thumb,
+.np-post-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: var(--cream) center / cover no-repeat;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.np-post-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.np-badge {
+  position: absolute;
+  top: 6px; left: 6px;
+  background: var(--orange);
+  color: var(--white);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.np-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 36px; height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--ink);
+  font-size: 0.8rem;
+}
+.np-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--ink);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.np-price { font-weight: 700; font-size: 0.85rem; color: var(--green); }
+.np-price s { color: var(--gray); font-weight: 500; font-size: 0.78rem; }
+.np-meta { font-size: 0.78rem; color: var(--gray); }
+
+/* Catégories en pastilles */
+.np-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.np-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-light);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--green-dark);
+}
+.np-chip:hover { background: var(--cream); border-color: var(--orange); }
+
+/* Cartes (Fraîcheur, Services) */
+.np-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.np-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--cream);
+}
+a.np-card:hover { box-shadow: inset 0 0 0 1px var(--orange); }
+.np-card-icon {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.np-card-icon svg { width: 22px; height: 22px; }
+.np-card strong { display: block; font-size: 0.9rem; color: var(--green-dark); }
+.np-card-text { display: block; font-size: 0.8rem; color: var(--gray); line-height: 1.4; }
+.np-cards + .np-products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.np-cards + .np-products .np-thumb { aspect-ratio: 16 / 9; }
+
+/* Localisation */
+.np-visit { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; font-size: 0.9rem; }
+.np-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray);
+  margin-bottom: 6px;
+}
+.np-visit p + .np-label { margin-top: 14px; }
+.np-visit a { color: var(--green); font-weight: 600; }
+.np-hours { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.np-hours li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--gray-light);
+}
+
+@media (max-width: 1024px) {
+  .nav-preview-inner { grid-template-columns: 220px 1fr; gap: 24px; }
+  .np-products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .np-products .np-product:nth-child(n+4) { display: none; }
+}
 
 .nav-cart-item a { display: flex; align-items: center; gap: 6px; }
 .cart-badge {
@@ -401,6 +724,215 @@ header {
 .hero p { font-size: 1.1rem; color: rgba(255,255,255,0.85); margin-bottom: 30px; max-width: 520px; }
 .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
 
+/* ===== Accueil : carrousel (assets/js/hero-slider.js) =====
+   Les diapos sont côte à côte dans .hero-track, qu'on décale de 100 % par
+   diapo. Toutes les diapos prennent la hauteur de la plus haute. */
+.hero.hero-slider {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  background: var(--green-dark);
+}
+.hero-track {
+  display: flex;
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.hero-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 64px 0 88px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+}
+.hero-slide-dark { background: linear-gradient(135deg, var(--green-dark) 0%, #06170F 100%); }
+.hero-slide-yellow { background: linear-gradient(135deg, var(--yellow) 0%, #E9B21B 100%); color: var(--ink); }
+.hero-slide-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  gap: 48px;
+  min-height: 340px;
+}
+.hero h2 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.hero-slide-yellow h2 { color: var(--green-dark); }
+.hero .hero-slide-yellow p { color: rgba(26, 26, 26, 0.8); }
+.hero .hero-slide-yellow .eyebrow { color: var(--green-dark); background: rgba(27, 67, 50, 0.12); }
+
+.hero-visual { display: flex; justify-content: center; }
+.hero-visual-logo img {
+  width: min(280px, 100%);
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--white);
+  border-radius: 50%;
+  padding: 36px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.hero-photo {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+  transform: rotate(1.5deg);
+  background: rgba(255, 255, 255, 0.1);
+}
+.hero-photo img { width: 100%; height: 100%; object-fit: cover; }
+.hero-photo figcaption {
+  position: absolute;
+  left: 14px; bottom: 14px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+.hero-photo figcaption strong { color: var(--orange); }
+.hero-photo figcaption s { color: var(--gray); font-weight: 500; font-size: 0.8rem; }
+
+.hero-services { display: grid; grid-template-columns: repeat(2, minmax(0, 150px)); gap: 16px; }
+.hero-service {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--white);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.hero-service:hover,
+.hero-service:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--yellow);
+  transform: translateY(-3px);
+}
+/* Même bande invisible que sous .product-card : évite que la tuile, en
+   remontant de 3px, "fuie" sous une souris posée sur son bord bas. */
+.hero-service { position: relative; }
+.hero-service::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 100%;
+  height: 6px;
+}
+.hero-service span {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+.hero-service:hover span { background: #d67714; }
+
+/* Flèches + points */
+.hero-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+}
+.hero-arrow {
+  width: 34px; height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.hero-arrow:hover { background: var(--yellow); }
+.hero-dots { display: flex; gap: 8px; }
+.hero-dots button {
+  width: 9px; height: 9px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.hero-dots button[aria-selected="true"] { width: 26px; background: var(--yellow); }
+
+/* Diapo sans visuel : le texte prend toute la largeur */
+.hero-slide-inner.no-visual { grid-template-columns: minmax(0, 760px); }
+
+/* Affiche (diapo créée dans l'admin) : image plein cadre */
+.hero-slide-poster {
+  position: relative;
+  min-height: 420px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.hero-poster-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-slide-poster.has-copy::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(6, 23, 15, 0.82) 0%, rgba(6, 23, 15, 0.45) 55%, rgba(6, 23, 15, 0) 100%);
+}
+.hero-poster-copy {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding-top: 48px;
+  padding-bottom: 88px;
+}
+.hero-poster-copy > * { max-width: 560px; }
+.hero .hero-slide-poster .hero-poster-copy p:not(.eyebrow) { color: rgba(255, 255, 255, 0.9); }
+.hero .hero-slide-poster h2 { color: var(--white); }
+.hero-poster-link { position: absolute; inset: 0; z-index: 3; }
+
+@media (max-width: 800px) {
+  .hero-slide { padding: 40px 0 84px; }
+  .hero-slide.hero-slide-poster { padding: 0; min-height: 320px; align-items: flex-end; }
+  .hero-slide-poster.has-copy::before {
+    background: linear-gradient(0deg, rgba(6, 23, 15, 0.88) 0%, rgba(6, 23, 15, 0.5) 60%, rgba(6, 23, 15, 0.1) 100%);
+  }
+  .hero-slide-inner { grid-template-columns: minmax(0, 1fr); gap: 28px; min-height: 0; }
+  .hero-visual { order: -1; }
+  .hero-photo { max-width: 100%; aspect-ratio: 16 / 9; transform: none; }
+  .hero-visual-logo { display: none; }
+  .hero-services { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .hero-service { padding: 12px 6px; font-size: 0.75rem; }
+  .hero-service span { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-track { transition: none; }
+}
+
 /* ===== Accueil : mise en page façon marketplace (sidebar + carrousels) ===== */
 .home-layout {
   display: grid;
@@ -432,7 +964,7 @@ header {
   color: var(--gray);
   padding: 10px 14px 6px;
 }
-.home-sidebar a {
+.home-sidebar > a {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -442,8 +974,9 @@ header {
   font-weight: 500;
   color: var(--ink);
 }
-.home-sidebar a:hover { background: var(--cream); color: var(--green-dark); }
-.home-sidebar a .dot {
+.home-sidebar > a:hover,
+.home-sidebar > a.is-active { background: var(--cream); color: var(--green-dark); }
+.home-sidebar > a .dot {
   width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--orange);
@@ -459,7 +992,7 @@ header {
     padding: 14px;
   }
   .home-sidebar h3 { flex-basis: 100%; }
-  .home-sidebar a { flex: 0 0 auto; }
+  .home-sidebar > a { flex: 0 0 auto; }
 }
 
 .home-main { display: flex; flex-direction: column; gap: 48px; min-width: 0; }
@@ -599,6 +1132,12 @@ a.fresh-card:focus-visible { outline: 2px solid var(--green); outline-offset: 2p
   padding: 22px 26px;
 }
 .fresh-note strong { color: var(--yellow); }
+
+/* ===== Cave à vin ===== */
+.page-hero.cave-hero {
+  background: linear-gradient(135deg, #6B1E2E 0%, #3A0F18 100%);
+}
+.cave-note { margin-top: 36px; background: #3A0F18; }
 
 /* ===== Localisation & Horaires / Contact ===== */
 .loc-grid {
@@ -773,7 +1312,6 @@ footer ul a:hover { color: var(--yellow); }
   position: relative;
   background: var(--white);
   border-radius: var(--radius);
-  overflow: hidden;
   box-shadow: var(--shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
@@ -783,6 +1321,20 @@ footer ul a:hover { color: var(--yellow); }
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
+/* Au survol, la carte remonte de 5px : sans cette bande invisible sous la
+   carte, une souris posée tout en bas (sur "Ajouter au panier") se
+   retrouvait hors de la carte, qui redescendait sous elle, se faisait
+   survoler de nouveau… et le curseur clignotait en boucle. */
+.product-card::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 100%;
+  height: 8px;
+}
+/* Coins arrondis de la photo (la carte ne coupe plus son contenu, sinon la
+   bande ci-dessus serait coupée aussi). */
+.product-card .product-image { border-radius: var(--radius) var(--radius) 0 0; }
 
 .product-image {
   width: 100%;
@@ -790,7 +1342,7 @@ footer ul a:hover { color: var(--yellow); }
   background-color: var(--cream);
   background-size: cover;
   background-position: center;
-  cursor: zoom-in;
+  cursor: pointer;
 }
 
 .badge-promo {
@@ -929,8 +1481,15 @@ footer ul a:hover { color: var(--yellow); }
   background: var(--cream);
 }
 .post-media img { width: 100%; height: 100%; object-fit: cover; }
+.post-media .post-media-frame {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--green-dark);
+  pointer-events: none;
+}
 .post-media[data-video] { cursor: pointer; }
-.post-media[data-zoom-img] { cursor: zoom-in; }
+.post-media[data-zoom-img] { cursor: pointer; }
 .post-media .play {
   position: absolute;
   inset: 0;
@@ -985,6 +1544,25 @@ footer ul a:hover { color: var(--yellow); }
 .lightbox-media iframe, .lightbox-media video {
   width: 100%; height: 100%; border: none;
 }
+/* Vidéo envoyée : le lecteur prend la forme exacte de la vidéo (verticale,
+   carrée ou horizontale), sans bandes noires autour. */
+.lightbox-media.is-video {
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: auto;
+  background: transparent;
+}
+.lightbox-media.is-video video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(860px, calc(100vw - 48px));
+  max-height: calc(100vh - 120px);
+  background: #000;
+  border-radius: 12px;
+}
+/* Juste après la fermeture (voir closeLightbox dans posts.js). */
+.lightbox.closing { pointer-events: auto; }
 .lightbox-media.is-image {
   aspect-ratio: auto;
   max-width: 640px;
@@ -1098,17 +1676,37 @@ footer ul a:hover { color: var(--yellow); }
 }
 .compare-card h4 { font-size: 0.95rem; margin-bottom: 8px; }
 .compare-card .btn-add-cart { margin-top: auto; }
+/* Toujours au premier plan (z-index) : sans ça, une grande photo, une
+   vidéo ou la comparaison passait par-dessus le bouton et avalait le clic. */
 .lightbox-close {
-  position: absolute;
-  top: 24px; right: 24px;
-  width: 44px; height: 44px;
+  position: fixed;
+  top: 20px; right: 20px;
+  z-index: 2;
+  width: 48px; height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.15);
-  color: var(--white);
-  font-size: 1.4rem;
+  background: var(--white);
+  color: var(--green-dark);
+  font-size: 1.8rem;
+  line-height: 1;
   cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease;
+  touch-action: manipulation; /* pas de délai au toucher sur mobile */
 }
+/* Zone cliquable élargie (invisible) autour du rond : un clic un peu à
+   côté du ✕ ferme quand même. */
+.lightbox-close::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+}
+.lightbox-close:hover,
+.lightbox-close:focus-visible { background: var(--yellow); }
 
 /* ===== Page Panier ===== */
 .cart-layout {
@@ -1288,6 +1886,7 @@ footer ul a:hover { color: var(--yellow); }
 }
 #adminLoginForm label,
 #fieldsForm label,
+#sliderSettingsForm label,
 .admin-modal label {
   display: block;
   font-size: 0.85rem;
@@ -1298,6 +1897,7 @@ footer ul a:hover { color: var(--yellow); }
 #adminLoginForm input,
 #fieldsForm input,
 #fieldsForm textarea,
+#sliderSettingsForm input,
 .admin-modal input,
 .admin-modal select,
 .admin-modal textarea {
@@ -1422,6 +2022,28 @@ footer ul a:hover { color: var(--yellow); }
 @media (max-width: 560px) {
   .admin-form-row { grid-template-columns: 1fr; }
 }
+
+/* Onglet Carrousel */
+.admin-label { font-size: 0.85rem; font-weight: 600; margin-top: 6px; }
+.admin-slider-auto { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin: 10px 0 8px; }
+.admin-slider-auto label { margin-bottom: 4px !important; }
+.admin-slide-thumb {
+  width: 120px;
+  aspect-ratio: 16 / 7;
+  border-radius: 8px;
+  background: var(--cream) center / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--white);
+  text-align: center;
+  padding: 4px;
+}
+.admin-slide-thumb.theme-green { background-color: var(--green); }
+.admin-slide-thumb.theme-dark { background-color: var(--green-dark); }
+.admin-slide-thumb.theme-yellow { background-color: var(--yellow); color: var(--green-dark); }
 
 .admin-upload {
   border: 2px dashed var(--gray-light);

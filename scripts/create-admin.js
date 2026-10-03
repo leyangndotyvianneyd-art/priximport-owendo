@@ -17,7 +17,9 @@ const path = require('path');
 const readline = require('readline');
 const bcrypt = require('bcryptjs');
 
-const ADMINS_FILE = path.join(__dirname, '..', 'data', 'admins.json');
+// Même emplacement que celui lu par server.js (STORAGE_DIR chez un hébergeur).
+const STORAGE_DIR = process.env.STORAGE_DIR ? path.resolve(process.env.STORAGE_DIR) : path.join(__dirname, '..');
+const ADMINS_FILE = path.join(STORAGE_DIR, 'data', 'admins.json');
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 function ask(question) {
@@ -31,15 +33,15 @@ function ask(question) {
   const emailRaw = await ask('Email : ');
   const email = emailRaw.trim().toLowerCase();
   const name = (await ask('Nom (optionnel) : ')).trim();
-  const password = await ask('Mot de passe (6 caractères minimum) : ');
+  const password = await ask('Mot de passe (10 caractères minimum) : ');
   rl.close();
 
   if (!email || !email.includes('@')) {
     console.error('\nEmail invalide.');
     process.exit(1);
   }
-  if (!password || password.length < 6) {
-    console.error('\nLe mot de passe doit faire au moins 6 caractères.');
+  if (!password || password.length < 10) {
+    console.error('\nLe mot de passe doit faire au moins 10 caractères.');
     process.exit(1);
   }
 

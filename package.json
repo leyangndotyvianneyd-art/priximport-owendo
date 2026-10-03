@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "preview": "live-server --port=5500",
-    "create-admin": "node scripts/create-admin.js"
+    "create-admin": "node scripts/create-admin.js",
+    "remove-test-videos": "node scripts/remove-test-videos.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

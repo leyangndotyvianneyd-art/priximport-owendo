@@ -1,0 +1,8 @@
+# Copie ce fichier en "key.properties" (même dossier) et remplis-le.
+# key.properties et le fichier .jks sont SECRETS : ils sont exclus de Git.
+# Garde une copie de sauvegarde du .jks et des mots de passe en lieu sûr :
+# sans eux, impossible de publier une mise à jour de l'appli sur le Play Store.
+storePassword=TON_MOT_DE_PASSE
+keyPassword=TON_MOT_DE_PASSE
+keyAlias=priximport
+storeFile=C:/Users/TON_NOM/priximport-upload-key.jks

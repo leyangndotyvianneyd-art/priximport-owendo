@@ -9,19 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" type="image/png" href="../assets/img/logo-prix-import.png">
 </head>
 <body>
 
 <header>
   <nav class="nav">
     <a href="../index.html" class="logo" aria-label="PRIX IMPORT OWENDO, accueil">
-      <svg class="logo-mark" viewBox="0 0 48 48" fill="none">
-        <rect x="2" y="2" width="44" height="44" rx="10" fill="#1B4332"/>
-        <path d="M14 18h20l-2.4 14.4a2 2 0 0 1-2 1.6H18.4a2 2 0 0 1-2-1.6L14 18Z" stroke="#F4C430" stroke-width="2.4" stroke-linejoin="round"/>
-        <path d="M17 18v-2a7 7 0 0 1 14 0v2" stroke="#F4C430" stroke-width="2.4" stroke-linecap="round"/>
-        <circle cx="20" cy="24" r="1.6" fill="#E8871E"/>
-        <circle cx="28" cy="24" r="1.6" fill="#E8871E"/>
-      </svg>
+      <img class="logo-mark" src="../assets/img/logo-prix-import.png" alt="Logo Prix Import">
       <span class="logo-text">
         <span class="l1">Prix Import</span>
         <span class="l2">— Owendo —</span>
@@ -60,6 +55,7 @@
           <button type="button" class="admin-tab active" data-tab="products">Produits</button>
           <button type="button" class="admin-tab" data-tab="posts">Nouveautés</button>
           <button type="button" class="admin-tab" data-tab="content">Contenu du site</button>
+          <button type="button" class="admin-tab" data-tab="slider">Carrousel</button>
         </div>
 
         <div class="admin-panel" data-panel="products">
@@ -196,6 +192,43 @@
             </table>
           </div>
         </div>
+
+        <div class="admin-panel" data-panel="slider" hidden>
+          <div class="admin-panel-head">
+            <h2>Carrousel de la page d'accueil</h2>
+          </div>
+          <p class="admin-hint">Le grand bandeau qui défile en haut de l'accueil. Ordre d'affichage : bienvenue → tes diapositives (ci-dessous) → diapositives automatiques.</p>
+          <form id="sliderSettingsForm">
+            <label style="max-width:260px;">Durée d'affichage de chaque diapositive (secondes)
+              <input type="number" name="delay" min="3" max="20" step="1" required>
+            </label>
+            <p class="admin-label">Diapositives automatiques à afficher</p>
+            <p class="admin-hint">Elles se remplissent toutes seules à partir du catalogue et des Nouveautés.</p>
+            <div class="admin-form-checkboxes admin-slider-auto">
+              <label class="admin-checkbox"><input type="checkbox" name="welcome"> Bienvenue (logo + présentation)</label>
+              <label class="admin-checkbox"><input type="checkbox" name="promo"> Promotions en cours (ou « Notre sélection »)</label>
+              <label class="admin-checkbox"><input type="checkbox" name="fraicheur"> Fraîcheur &amp; Local</label>
+              <label class="admin-checkbox"><input type="checkbox" name="nouveaute"> Dernière nouveauté en photo</label>
+              <label class="admin-checkbox"><input type="checkbox" name="services"> Livraison &amp; Mobile Money</label>
+            </div>
+            <p class="admin-error" id="sliderSettingsError" hidden></p>
+            <div class="admin-form-actions">
+              <button type="submit" class="btn btn-primary">Enregistrer les réglages</button>
+            </div>
+          </form>
+
+          <div class="admin-panel-head" style="margin-top:36px;">
+            <h2>Mes diapositives</h2>
+            <button type="button" class="btn btn-primary" id="btnNewSlide">+ Ajouter une diapositive</button>
+          </div>
+          <p class="admin-hint">Affiche (une image sur toute la largeur, idéale pour un visuel promo) ou texte + photo. Utilise ↑ ↓ pour changer l'ordre.</p>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Aperçu</th><th>Diapositive</th><th>Visible</th><th></th></tr></thead>
+              <tbody id="slidesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -228,6 +261,17 @@
           <input type="number" name="oldPrice" min="0">
         </label>
       </div>
+      <label>Type de vin (uniquement pour la catégorie « Cave à vin »)
+        <select name="wineType">
+          <option value="">—</option>
+          <option value="Rouge">Rouge</option>
+          <option value="Blanc">Blanc</option>
+          <option value="Rosé">Rosé</option>
+          <option value="Champagne & mousseux">Champagne &amp; mousseux</option>
+          <option value="Spiritueux">Spiritueux</option>
+        </select>
+      </label>
+      <p class="admin-hint">Mets la catégorie « Cave à vin » pour qu'un produit apparaisse dans l'onglet Cave à vin du site et de l'application ; le type sert aux filtres Rouge / Blanc / Rosé...</p>
       <label>Image (URL, ou nom de fichier dans assets/img/products/)
         <input type="text" name="image" id="productImageInput">
       </label>
@@ -371,6 +415,74 @@
       <p class="admin-error" id="cardFormError" hidden></p>
       <div class="admin-form-actions">
         <button type="button" class="btn btn-outline" id="btnCancelCard">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Formulaire diapositive du carrousel (ajout / édition) -->
+<div class="admin-modal" id="slideModal" hidden>
+  <div class="admin-modal-card">
+    <h3 id="slideModalTitle">Ajouter une diapositive</h3>
+    <form id="slideForm">
+      <input type="hidden" name="id">
+      <div class="admin-form-row">
+        <label>Type *
+          <select name="layout" id="slideLayoutSelect">
+            <option value="poster">Affiche (image pleine largeur)</option>
+            <option value="split">Texte + photo</option>
+          </select>
+        </label>
+        <label>Couleur de fond
+          <select name="theme">
+            <option value="green">Vert</option>
+            <option value="dark">Vert foncé</option>
+            <option value="yellow">Jaune</option>
+          </select>
+        </label>
+      </div>
+      <label id="slideImageLabel">Image *
+        <input type="text" name="image" id="slideImageInput" placeholder="URL, ou envoie un fichier ci-dessous">
+      </label>
+      <div class="admin-upload" data-upload-target="slideImageInput" data-upload-kind="slide-image">
+        <input type="file" accept="image/*" hidden>
+        <span class="admin-upload-text">📁 Glisse une image ici, ou <strong>clique pour choisir</strong></span>
+      </div>
+      <p class="admin-hint" id="slidePosterHint">Pour une affiche, choisis une image en format paysage (idéalement 1600 × 600 pixels) : les bords peuvent être légèrement rognés selon l'écran. Le texte ci-dessous est facultatif et s'affiche par-dessus l'image.</p>
+      <label>Petit texte au-dessus du titre (ex. « Offre de la semaine »)
+        <input type="text" name="eyebrow">
+      </label>
+      <label id="slideTitleLabel">Titre
+        <input type="text" name="title">
+      </label>
+      <label>Texte
+        <textarea name="text" rows="2"></textarea>
+      </label>
+      <div class="admin-form-row">
+        <label>Texte du bouton (ex. « J'en profite »)
+          <input type="text" name="ctaLabel">
+        </label>
+        <label>Lien du bouton
+          <input type="text" name="ctaHref" list="slideLinkList" placeholder="pages/catalogue.html">
+          <datalist id="slideLinkList">
+            <option value="pages/catalogue.html">Catalogue</option>
+            <option value="pages/fraicheur.html">Fraîcheur & Local</option>
+            <option value="pages/nouveautes.html">Nouveautés</option>
+            <option value="pages/services.html">Services</option>
+            <option value="pages/localisation.html">Localisation</option>
+            <option value="contact.html">Contact</option>
+            <option value="panier.html">Panier</option>
+          </datalist>
+        </label>
+      </div>
+      <p class="admin-hint">Lien vers une page du site (choisis dans la liste) ou une adresse complète commençant par https://. Pour une catégorie : pages/catalogue.html?category=Boissons</p>
+      <div class="admin-form-row admin-form-checkboxes">
+        <label class="admin-checkbox"><input type="checkbox" name="active" checked> Visible sur le site</label>
+      </div>
+      <p class="admin-error" id="slideFormError" hidden></p>
+      <div class="admin-form-actions">
+        <button type="button" class="btn btn-outline" id="btnCancelSlide">Annuler</button>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
       </div>
     </form>

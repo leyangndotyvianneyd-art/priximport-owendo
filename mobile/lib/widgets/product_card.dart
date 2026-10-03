@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
+import 'image_viewer.dart';
 
 /// Carte produit du catalogue — image, nom, unité, prix (barré si promo)
 /// et bouton "Ajouter au panier", équivalent de products.js côté web.
@@ -27,14 +28,19 @@ class ProductCard extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                product.image.isNotEmpty
-                    ? Image.network(
-                        product.image,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: AppColors.grayLight,
-                          child: const Icon(Icons.image_not_supported_outlined,
-                              color: AppColors.gray),
+                product.imageUrl != null
+                    ? GestureDetector(
+                        // Toucher la photo l'ouvre en grand (zoom possible).
+                        onTap: () => openImageViewer(context, product.imageUrl!,
+                            title: product.name),
+                        child: Image.network(
+                          product.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: AppColors.grayLight,
+                            child: const Icon(Icons.image_not_supported_outlined,
+                                color: AppColors.gray),
+                          ),
                         ),
                       )
                     : Container(color: AppColors.grayLight),

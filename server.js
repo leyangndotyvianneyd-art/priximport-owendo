@@ -1,34 +1,114 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const IS_PROD = process.env.NODE_ENV === 'production';
 
-app.use(express.json());
+// Dossier où sont rangées les données modifiables (data/*.json) et les
+// fichiers envoyés depuis l'admin (assets/videos, assets/img/...). Par
+// défaut : le dossier du projet. Chez un hébergeur, pointe STORAGE_DIR vers
+// un disque persistant, sinon tout ce qui est ajouté depuis l'admin (et les
+// commandes) serait perdu à chaque redémarrage/redéploiement.
+const STORAGE_DIR = process.env.STORAGE_DIR ? path.resolve(process.env.STORAGE_DIR) : __dirname;
+const DATA_DIR = path.join(STORAGE_DIR, 'data');
+
+// Premier démarrage sur un disque vide : on y recopie les données livrées
+// avec le projet (catalogue, publications, contenu) pour ne pas partir de zéro.
+if (STORAGE_DIR !== __dirname) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  ['products.json', 'posts.json', 'content.json'].forEach((f) => {
+    const target = path.join(DATA_DIR, f);
+    const seed = path.join(__dirname, 'data', f);
+    if (!fs.existsSync(target) && fs.existsSync(seed)) fs.copyFileSync(seed, target);
+  });
+}
+
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (IS_PROD && !SESSION_SECRET) {
+  console.error('SESSION_SECRET manquant : définis cette variable d\'environnement avant de lancer le serveur en production.');
+  process.exit(1);
+}
+
+// Derrière l'hébergeur (Render, Railway...), le HTTPS est géré par un proxy :
+// nécessaire pour que le cookie "secure" de l'admin fonctionne.
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('X-Frame-Options', 'SAMEORIGIN');
+  next();
+});
+
+app.use(express.json({ limit: '200kb' }));
 
 // Session utilisée par la page d'administration (pages/admin.html) pour
-// savoir qui est connecté. En production, définis la variable
-// d'environnement SESSION_SECRET avec une valeur secrète à toi ; sinon une
-// valeur par défaut est utilisée (change-la si tu mets le site en ligne
-// publiquement).
+// savoir qui est connecté. En production, SESSION_SECRET est obligatoire.
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'pio-admin-secret-a-changer-en-production',
+  // Sans SESSION_SECRET : clé aléatoire à chaque démarrage (il faut juste se
+  // reconnecter à l'admin après un redémarrage) — jamais une clé connue.
+  secret: SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 8 * 60 * 60 * 1000 } // 8 heures
+  cookie: {
+    maxAge: 8 * 60 * 60 * 1000, // 8 heures
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: IS_PROD
+  }
 }));
 
+// Seuls ces fichiers sont publics. Tout le reste du dossier (commandes,
+// comptes admin, code du serveur, sources de l'appli...) ne doit jamais
+// être téléchargeable depuis le navigateur.
+const PUBLIC_DATA_FILES = new Set(['/data/products.json', '/data/posts.json', '/data/content.json']);
+
+function isPublicPath(p) {
+  return p === '/'
+    || /^\/[A-Za-z0-9_-]+\.html$/.test(p)
+    || p.startsWith('/assets/')
+    || p.startsWith('/pages/')
+    || p.startsWith('/downloads/')
+    || p === '/favicon.ico';
+}
+
+// Données publiques : lues dans DATA_DIR (là où l'admin écrit).
+app.get([...PUBLIC_DATA_FILES], (req, res) => {
+  res.set('Cache-Control', 'no-cache');
+  res.sendFile(path.join(DATA_DIR, path.basename(req.path)));
+});
+
+app.use((req, res, next) => {
+  let p;
+  try {
+    p = decodeURIComponent(req.path);
+  } catch (e) {
+    return res.status(400).send('Adresse invalide.');
+  }
+  // Refuse les détours du type /assets/../data/orders.json
+  if (p.includes('..') || p.includes('\\') || p.includes('\0')) return res.status(404).send('Page introuvable.');
+  if (p.startsWith('/api/') || isPublicPath(p)) return next();
+  res.status(404).send('Page introuvable.');
+});
+
+// Fichiers envoyés depuis l'admin (s'ils sont rangés hors du projet), puis le site.
+if (STORAGE_DIR !== __dirname) {
+  app.use('/assets', express.static(path.join(STORAGE_DIR, 'assets')));
+}
 app.use(express.static(path.join(__dirname)));
 
-const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
-const ORDERS_FILE = path.join(__dirname, 'data', 'orders.json');
-const POSTS_FILE = path.join(__dirname, 'data', 'posts.json');
-const ADMINS_FILE = path.join(__dirname, 'data', 'admins.json');
-const CONTENT_FILE = path.join(__dirname, 'data', 'content.json');
+const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const POSTS_FILE = path.join(DATA_DIR, 'posts.json');
+const ADMINS_FILE = path.join(DATA_DIR, 'admins.json');
+const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 
 // URL du "Web App" Google Apps Script qui reçoit chaque commande et l'ajoute
 // à une feuille Google Sheets pour l'administrateur. Laisse la valeur vide
@@ -124,18 +204,52 @@ app.get('/api/content', (req, res) => {
 
 // API : réception d'une commande client (utilisé par assets/js/panier-page.js
 // et par l'appli mobile — cart_screen.dart)
-app.post('/api/commande', (req, res) => {
-  const { items, customer } = req.body || {};
+app.post('/api/commande', async (req, res) => {
+  const { items: rawItems, customer: rawCustomer } = req.body || {};
 
-  if (!Array.isArray(items) || items.length === 0) {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
     return res.status(400).json({ error: 'Le panier est vide.' });
   }
-  if (!customer || !customer.name || !customer.phone) {
+  if (rawItems.length > 100) {
+    return res.status(400).json({ error: 'Trop d\'articles dans une seule commande.' });
+  }
+  const clean = (v, max) => String(v == null ? '' : v).trim().slice(0, max);
+  const customer = {
+    name: clean(rawCustomer && rawCustomer.name, 80),
+    phone: clean(rawCustomer && rawCustomer.phone, 30),
+    mode: rawCustomer && rawCustomer.mode === 'livraison' ? 'livraison' : 'retrait',
+    address: clean(rawCustomer && rawCustomer.address, 300)
+  };
+  if (!customer.name || !customer.phone) {
     return res.status(400).json({ error: 'Nom et téléphone requis.' });
+  }
+  if (customer.mode === 'livraison' && !customer.address) {
+    return res.status(400).json({ error: 'Adresse de livraison requise.' });
+  }
+
+  // Les prix viennent toujours du catalogue, jamais du navigateur ou de
+  // l'appli : sinon n'importe qui pourrait commander à 0 FCFA.
+  let catalogue;
+  try {
+    catalogue = await readJsonFile(PRODUCTS_FILE);
+  } catch (e) {
+    return res.status(500).json({ error: 'Catalogue indisponible, réessaie dans un instant.' });
+  }
+  const items = [];
+  for (const raw of rawItems) {
+    const product = catalogue.find((p) => p.id === String(raw && raw.id) && p.active !== false);
+    const qty = Number(raw && raw.qty);
+    if (!product) {
+      return res.status(400).json({ error: `Le produit « ${clean(raw && raw.name, 60) || 'inconnu'} » n'est plus disponible. Retire-le du panier.` });
+    }
+    if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
+      return res.status(400).json({ error: `Quantité invalide pour « ${product.name} ».` });
+    }
+    items.push({ id: product.id, name: product.name, price: Number(product.price) || 0, qty });
   }
 
   const reference = 'PIO-' + Date.now().toString(36).toUpperCase();
-  const total = items.reduce((sum, i) => sum + (Number(i.price) * Number(i.qty)), 0);
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
 
   const order = { reference, date: new Date().toISOString(), customer, items, total };
 
@@ -157,7 +271,7 @@ app.post('/api/commande', (req, res) => {
       if (customer.address) console.log(`    Adresse : ${customer.address}`);
       console.log(`    Total : ${total.toLocaleString('fr-FR')} FCFA`);
       sendOrderToGoogleSheet(order);
-      res.json({ success: true, reference, total });
+      res.json({ success: true, reference, total, items });
     });
   });
 });
@@ -185,7 +299,8 @@ function requireAdmin(req, res, next) {
 const UPLOAD_DESTS = {
   video: 'assets/videos',
   'product-image': 'assets/img/products',
-  'post-image': 'assets/img/posts'
+  'post-image': 'assets/img/posts',
+  'slide-image': 'assets/img/slides'
 };
 
 const upload = multer({
@@ -193,7 +308,9 @@ const upload = multer({
     destination: (req, file, cb) => {
       const dest = UPLOAD_DESTS[req.body.kind];
       if (!dest) return cb(new Error('Type de fichier inconnu.'));
-      cb(null, path.join(__dirname, dest));
+      const dir = path.join(STORAGE_DIR, dest);
+      fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
     },
     filename: (req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase();
@@ -219,8 +336,36 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
   });
 });
 
+// Limite les essais de mot de passe : 8 échecs en 15 minutes par adresse IP,
+// puis blocage temporaire (contre les robots qui testent des mots de passe).
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_MAX_FAILS = 8;
+const loginFails = new Map();
+
+function loginBlocked(ip) {
+  const entry = loginFails.get(ip);
+  if (!entry) return false;
+  if (Date.now() - entry.first > LOGIN_WINDOW_MS) {
+    loginFails.delete(ip);
+    return false;
+  }
+  return entry.count >= LOGIN_MAX_FAILS;
+}
+
+function recordLoginFail(ip) {
+  const entry = loginFails.get(ip);
+  if (!entry || Date.now() - entry.first > LOGIN_WINDOW_MS) {
+    loginFails.set(ip, { first: Date.now(), count: 1 });
+  } else {
+    entry.count++;
+  }
+}
+
 app.post('/api/admin/login', async (req, res) => {
   const { email, password } = req.body || {};
+  if (loginBlocked(req.ip)) {
+    return res.status(429).json({ error: 'Trop de tentatives. Réessaie dans 15 minutes.' });
+  }
   if (!email || !password) {
     return res.status(400).json({ error: 'Email et mot de passe requis.' });
   }
@@ -232,12 +377,18 @@ app.post('/api/admin/login', async (req, res) => {
   }
   const normalizedEmail = String(email).trim().toLowerCase();
   const admin = admins.find((a) => a.email === normalizedEmail);
-  if (!admin || !bcrypt.compareSync(password, admin.passwordHash)) {
+  if (!admin || !bcrypt.compareSync(String(password), admin.passwordHash)) {
+    recordLoginFail(req.ip);
     return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
   }
-  req.session.adminId = admin.id;
-  req.session.adminEmail = admin.email;
-  res.json({ success: true, email: admin.email, name: admin.name || null });
+  loginFails.delete(req.ip);
+  // Nouvelle session à chaque connexion (évite la fixation de session).
+  req.session.regenerate((err) => {
+    if (err) return res.status(500).json({ error: 'Erreur serveur.' });
+    req.session.adminId = admin.id;
+    req.session.adminEmail = admin.email;
+    res.json({ success: true, email: admin.email, name: admin.name || null });
+  });
 });
 
 app.post('/api/admin/logout', (req, res) => {
@@ -276,6 +427,7 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       category: String(p.category).trim(),
       image: p.image ? String(p.image).trim() : '',
       ...(p.group ? { group: String(p.group).trim() } : {}),
+      ...(p.wineType ? { wineType: String(p.wineType).trim() } : {}),
       ...(Array.isArray(p.images) && p.images.length ? { images: p.images.map((i) => String(i).trim()).filter(Boolean) } : {}),
       active: p.active !== false
     };
@@ -315,6 +467,10 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
     if (p.group != null) {
       if (p.group === '') delete updated.group;
       else updated.group = String(p.group).trim();
+    }
+    if (p.wineType != null) {
+      if (p.wineType === '') delete updated.wineType;
+      else updated.wineType = String(p.wineType).trim();
     }
     if (p.images != null) {
       const images = Array.isArray(p.images) ? p.images.map((i) => String(i).trim()).filter(Boolean) : [];
@@ -579,6 +735,146 @@ app.delete('/api/admin/content/cards/:section/:id', requireAdmin, requireCardSec
     content.cards = content.cards || {};
     content.cards[section] = list.filter((c) => c.id !== req.params.id);
     if (content.cards[section].length === before) return res.status(404).json({ error: 'Carte introuvable.' });
+    await writeJsonFile(CONTENT_FILE, content);
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// Carrousel de la page d'accueil (assets/js/hero-slider.js) : réglages
+// (vitesse, diapos automatiques à garder) + diapos créées par l'admin.
+// Stocké dans content.json sous "heroSlider".
+
+const SLIDER_AUTO_KEYS = ['welcome', 'promo', 'fraicheur', 'nouveaute', 'services'];
+const SLIDE_LAYOUTS = ['split', 'poster'];
+const SLIDE_THEMES = ['green', 'dark', 'yellow'];
+
+function getSlider(content) {
+  const s = content.heroSlider || {};
+  const auto = {};
+  SLIDER_AUTO_KEYS.forEach((k) => { auto[k] = !s.auto || s.auto[k] !== false; });
+  content.heroSlider = {
+    delay: Number(s.delay) >= 3 ? Number(s.delay) : 6,
+    auto,
+    slides: Array.isArray(s.slides) ? s.slides : []
+  };
+  return content.heroSlider;
+}
+
+// Lien d'une diapo : page du site (chemin relatif) ou adresse http(s) —
+// rien d'autre (pas de "javascript:" par exemple).
+function cleanSlideLink(value) {
+  const href = String(value || '').trim();
+  if (!href) return '';
+  if (/^https?:\/\//i.test(href)) return href;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return '';
+  return href.replace(/^\/+/, '');
+}
+
+function buildSlide(b, id) {
+  const layout = SLIDE_LAYOUTS.includes(b.layout) ? b.layout : 'split';
+  const slide = {
+    id,
+    layout,
+    theme: SLIDE_THEMES.includes(b.theme) ? b.theme : 'green',
+    eyebrow: String(b.eyebrow || '').trim(),
+    title: String(b.title || '').trim(),
+    text: String(b.text || '').trim(),
+    image: String(b.image || '').trim(),
+    ctaLabel: String(b.ctaLabel || '').trim(),
+    ctaHref: cleanSlideLink(b.ctaHref),
+    active: b.active !== false && b.active !== 'false'
+  };
+  if (layout === 'poster' && !slide.image) throw new Error('Une affiche a besoin d’une image.');
+  if (layout === 'split' && !slide.title) throw new Error('Titre requis.');
+  if (b.ctaHref && !slide.ctaHref) throw new Error('Lien du bouton invalide.');
+  return slide;
+}
+
+app.put('/api/admin/slider/settings', requireAdmin, async (req, res) => {
+  try {
+    const content = await readJsonFile(CONTENT_FILE);
+    const slider = getSlider(content);
+    const b = req.body || {};
+    const delay = Number(b.delay);
+    if (!(delay >= 3 && delay <= 20)) return res.status(400).json({ error: 'La durée doit être entre 3 et 20 secondes.' });
+    slider.delay = delay;
+    SLIDER_AUTO_KEYS.forEach((k) => { slider.auto[k] = !!(b.auto && b.auto[k]); });
+    await writeJsonFile(CONTENT_FILE, content);
+    res.json({ success: true, heroSlider: slider });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+app.post('/api/admin/slider/slides', requireAdmin, async (req, res) => {
+  try {
+    const content = await readJsonFile(CONTENT_FILE);
+    const slider = getSlider(content);
+    const b = req.body || {};
+    let slide;
+    try {
+      slide = buildSlide(b, slugify('slide-' + (b.title || 'affiche')) + '-' + Date.now().toString(36));
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    slider.slides.push(slide);
+    await writeJsonFile(CONTENT_FILE, content);
+    res.json({ success: true, slide });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+app.put('/api/admin/slider/slides/:id', requireAdmin, async (req, res) => {
+  try {
+    const content = await readJsonFile(CONTENT_FILE);
+    const slider = getSlider(content);
+    const idx = slider.slides.findIndex((s) => s.id === req.params.id);
+    if (idx < 0) return res.status(404).json({ error: 'Diapositive introuvable.' });
+    try {
+      slider.slides[idx] = buildSlide(req.body || {}, slider.slides[idx].id);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    await writeJsonFile(CONTENT_FILE, content);
+    res.json({ success: true, slide: slider.slides[idx] });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+app.post('/api/admin/slider/slides/:id/move', requireAdmin, async (req, res) => {
+  try {
+    const content = await readJsonFile(CONTENT_FILE);
+    const slider = getSlider(content);
+    const idx = slider.slides.findIndex((s) => s.id === req.params.id);
+    if (idx < 0) return res.status(404).json({ error: 'Diapositive introuvable.' });
+    const to = idx + (Number((req.body || {}).dir) < 0 ? -1 : 1);
+    if (to >= 0 && to < slider.slides.length) {
+      const [moved] = slider.slides.splice(idx, 1);
+      slider.slides.splice(to, 0, moved);
+      await writeJsonFile(CONTENT_FILE, content);
+    }
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+app.delete('/api/admin/slider/slides/:id', requireAdmin, async (req, res) => {
+  try {
+    const content = await readJsonFile(CONTENT_FILE);
+    const slider = getSlider(content);
+    const before = slider.slides.length;
+    slider.slides = slider.slides.filter((s) => s.id !== req.params.id);
+    if (slider.slides.length === before) return res.status(404).json({ error: 'Diapositive introuvable.' });
     await writeJsonFile(CONTENT_FILE, content);
     res.json({ success: true });
   } catch (e) {

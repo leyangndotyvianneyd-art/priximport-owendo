@@ -128,12 +128,15 @@ class _ErrorState extends StatelessWidget {
           children: [
             const Icon(Icons.wifi_off, size: 42, color: AppColors.gray),
             const SizedBox(height: 12),
-            const Text(
-              'Impossible de joindre le serveur.\n'
-              'Vérifie que le serveur (npm start) tourne bien et que\n'
-              "ApiConfig.baseUrl pointe vers la bonne adresse.",
+            Text(
+              ApiConfig.isPublicBuild
+                  ? 'Impossible de charger le catalogue.\n'
+                      'Vérifie ta connexion Internet puis réessaie.'
+                  : 'Impossible de joindre le serveur.\n'
+                      'Vérifie que le serveur (npm start) tourne bien et que\n'
+                      "l'adresse du serveur est la bonne.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.gray),
+              style: const TextStyle(color: AppColors.gray),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -141,6 +144,7 @@ class _ErrorState extends StatelessWidget {
               alignment: WrapAlignment.center,
               children: [
                 ElevatedButton(onPressed: onRetry, child: const Text('Réessayer')),
+                if (!ApiConfig.isPublicBuild)
                 OutlinedButton(
                   onPressed: () async {
                     final changed = await Navigator.of(context).push<bool>(

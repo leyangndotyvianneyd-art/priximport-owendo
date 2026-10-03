@@ -9,7 +9,9 @@ import '../utils/formatters.dart';
 
 /// Numéro WhatsApp du magasin, utilisé pour la confirmation de commande
 /// (même numéro que assets/js/panier-page.js côté site web).
-const String shopPhone = '24107413215';
+/// Numéro WhatsApp de secours, si le contenu de l'admin n'a pas pu être
+/// chargé. Le vrai numéro vient de l'admin (onglet "Contenu du site").
+const String fallbackShopPhone = '24107413215';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -66,6 +68,14 @@ class _CartScreenState extends State<CartScreen> {
     Map<String, dynamic> result;
     try {
       result = await ApiService.sendOrder(items: items, customer: customer);
+    } on OrderRejected catch (e) {
+      // Le serveur refuse la commande : on l'explique, sans vider le panier.
+      if (!mounted) return;
+      setState(() => _sending = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message), duration: const Duration(seconds: 5)),
+      );
+      return;
     } catch (_) {
       // Le serveur est injoignable (pas de Wi-Fi, serveur éteint...) :
       // on ne bloque jamais la commande, comme sur le site web.
@@ -92,6 +102,13 @@ class _CartScreenState extends State<CartScreen> {
       'Bonjour, je confirme ma commande $reference '
       '(${formatFcfa(total is num ? total : 0)}) — ${_nameCtrl.text.trim()}.',
     );
+    String shopPhone = fallbackShopPhone;
+    try {
+      final wa = (await ApiService.fetchContent()).whatsapp;
+      if (wa.isNotEmpty) shopPhone = wa;
+    } catch (_) {
+      // Hors connexion : numéro de secours.
+    }
     final uri = Uri.parse('https://wa.me/$shopPhone?text=$text');
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
@@ -146,8 +163,8 @@ class _CartScreenState extends State<CartScreen> {
                 child: SizedBox(
                   width: 52,
                   height: 52,
-                  child: item.product.image.isNotEmpty
-                      ? Image.network(item.product.image, fit: BoxFit.cover,
+                  child: item.product.imageUrl != null
+                      ? Image.network(item.product.imageUrl!, fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>
                               Container(color: AppColors.grayLight))
                       : Container(color: AppColors.grayLight),

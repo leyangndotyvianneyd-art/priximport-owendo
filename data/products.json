@@ -23,7 +23,7 @@
     "id": "huile-vegetale-5l",
     "name": "Huile végétale",
     "unit": "Bidon 5L",
-    "price": 8900,
+    "price": 1200,
     "category": "Épicerie",
     "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYGjtzJY_NzVlri2AGIyB-tKHLKHUIwaK1uEHKwQZ_UA&s=10",
     "active": true,
@@ -133,7 +133,7 @@
   },
   {
     "id": "produit-menager",
-    "name": "Produit ménager",
+    "name": "soin corporels",
     "unit": "1L",
     "price": 2850,
     "promo": false,

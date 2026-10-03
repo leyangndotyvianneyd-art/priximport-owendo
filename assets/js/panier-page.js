@@ -104,16 +104,25 @@
       address: form.address.value.trim()
     };
     const items = window.Cart.getAll();
+    const submitBtn = form.querySelector('[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
 
     fetch('/api/commande', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items, customer })
     })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.success) throw new Error(data.error || 'Erreur');
-        showConfirmation(data.reference, customer, items);
+      .then(res => res.json().then(data => ({ ok: res.ok, data }), () => { throw new Error('offline'); }))
+      .then(({ ok, data }) => {
+        if (!ok || !data.success) {
+          // Le serveur a répondu mais refuse la commande (produit retiré,
+          // quantité invalide...) : on l'explique au client, sans vider le panier.
+          if (submitBtn) submitBtn.disabled = false;
+          alert(data.error || 'La commande n\'a pas pu être enregistrée.');
+          return;
+        }
+        // Le serveur renvoie les articles et le total au prix du catalogue.
+        showConfirmation(data.reference, customer, data.items || items, data.total);
         window.Cart.clear();
       })
       .catch(() => {
@@ -125,8 +134,8 @@
       });
   }
 
-  function showConfirmation(reference, customer, items) {
-    const total = items.reduce((s, i) => s + i.qty * i.price, 0);
+  function showConfirmation(reference, customer, items, serverTotal) {
+    const total = typeof serverTotal === 'number' ? serverTotal : items.reduce((s, i) => s + i.qty * i.price, 0);
     const lines = items.map(i => `• ${i.qty} x ${i.name}`).join('\n');
     const message = encodeURIComponent(
       `Bonjour Prix Import Owendo, je viens de passer la commande ${reference} (${customer.mode}) :\n${lines}\nTotal : ${formatPrice(total)}\nNom : ${customer.name} — Tél : ${customer.phone}${customer.address ? ' — Adresse : ' + customer.address : ''}`
