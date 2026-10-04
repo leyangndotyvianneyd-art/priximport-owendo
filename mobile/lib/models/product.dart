@@ -16,6 +16,10 @@ class Product {
   /// Type de vin (Rouge, Blanc...) pour les produits de la catégorie
   /// "Cave à vin" — sert aux filtres de l'écran Cave à vin.
   final String? wineType;
+
+  /// Type dans les autres rayons (Électroménager, Animalerie...), pour
+  /// leurs filtres (ex. Nourriture / Accessoires).
+  final String? subType;
   final String image;
   final bool active;
 
@@ -30,6 +34,7 @@ class Product {
     this.promoEnd,
     required this.category,
     this.wineType,
+    this.subType,
     required this.image,
     this.active = true,
   });
@@ -71,6 +76,7 @@ class Product {
       promoEnd: json['promoEnd']?.toString(),
       category: json['category']?.toString() ?? 'Divers',
       wineType: json['wineType']?.toString(),
+      subType: json['subType']?.toString(),
       image: json['image']?.toString() ?? '',
       active: json['active'] != false,
     );

@@ -428,6 +428,7 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       image: p.image ? String(p.image).trim() : '',
       ...(p.group ? { group: String(p.group).trim() } : {}),
       ...(p.wineType ? { wineType: String(p.wineType).trim() } : {}),
+      ...(p.subType ? { subType: String(p.subType).trim() } : {}),
       ...(Array.isArray(p.images) && p.images.length ? { images: p.images.map((i) => String(i).trim()).filter(Boolean) } : {}),
       active: p.active !== false
     };
@@ -471,6 +472,10 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
     if (p.wineType != null) {
       if (p.wineType === '') delete updated.wineType;
       else updated.wineType = String(p.wineType).trim();
+    }
+    if (p.subType != null) {
+      if (p.subType === '') delete updated.subType;
+      else updated.subType = String(p.subType).trim();
     }
     if (p.images != null) {
       const images = Array.isArray(p.images) ? p.images.map((i) => String(i).trim()).filter(Boolean) : [];

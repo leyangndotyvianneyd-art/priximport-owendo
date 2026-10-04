@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/cart_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import 'main_shell.dart';
 import '../utils/formatters.dart';
 
 /// Numéro WhatsApp du magasin, utilisé pour la confirmation de commande
@@ -134,15 +135,20 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildEmpty() {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.shopping_cart_outlined, size: 46, color: AppColors.gray),
-            SizedBox(height: 12),
-            Text('Votre panier est vide.', style: TextStyle(color: AppColors.gray)),
+            const Icon(Icons.shopping_cart_outlined, size: 46, color: AppColors.gray),
+            const SizedBox(height: 12),
+            const Text('Votre panier est vide.', style: TextStyle(color: AppColors.gray)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => openShellTab(context, ShellTabs.catalogue),
+              child: const Text('Voir le catalogue'),
+            ),
           ],
         ),
       ),
@@ -299,7 +305,10 @@ class _CartScreenState extends State<CartScreen> {
             ),
             const SizedBox(height: 10),
             TextButton(
-              onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+              onPressed: () {
+                setState(() => _confirmation = null);
+                openShellTab(context, ShellTabs.home);
+              },
               child: const Text("Retour à l'accueil"),
             ),
           ],

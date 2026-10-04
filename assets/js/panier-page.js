@@ -13,6 +13,8 @@
 
   function resolveImage(image) {
     if (!image) return '';
+    // Photo envoyée depuis l'admin : chemin déjà complet (assets/...).
+    if (/^assets\//.test(image)) return '' + image;
     return /^https?:\/\//.test(image) ? image : `assets/img/products/${image}`;
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/cart_provider.dart';
-import '../screens/cart_screen.dart';
+import '../screens/main_shell.dart';
 
 /// Icône panier avec pastille de comptage, utilisée dans l'AppBar de
 /// chaque écran — équivalent du badge injecté en JS sur le site web
@@ -20,11 +20,7 @@ class CartBadgeIcon extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.shopping_cart_outlined),
           tooltip: 'Panier',
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const CartScreen()),
-            );
-          },
+          onPressed: () => openShellTab(context, ShellTabs.cart),
         ),
         if (count > 0)
           Positioned(

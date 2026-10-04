@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/cart_provider.dart';
-import 'screens/home_screen.dart';
+import 'screens/main_shell.dart';
 import 'services/api_service.dart';
 import 'theme/app_theme.dart';
 
@@ -23,7 +23,7 @@ class PrixImportOwendoApp extends StatelessWidget {
         title: 'Prix Import Owendo',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.theme,
-        home: const HomeScreen(),
+        home: const MainShell(),
       ),
     );
   }

@@ -28,6 +28,8 @@
 
   function resolveProductImage(image) {
     if (!image) return '';
+    // Photo envoyée depuis l'admin : chemin déjà complet (assets/...).
+    if (/^assets\//.test(image)) return base + image;
     return /^https?:\/\//.test(image) ? image : `${base}assets/img/products/${image}`;
   }
 
@@ -150,6 +152,29 @@
         <div class="np-body">
           <div class="np-products">${picks.map(productHTML).join('') || '<p class="np-empty">La cave se remplit bientôt.</p>'}</div>
           ${chips ? `<div class="np-chips">${chips}</div>` : ''}
+        </div>`;
+    },
+
+    rayons(d) {
+      const rayons = window.PioRayons || [];
+      const active = d.products.filter((p) => p.active !== false);
+      const cards = rayons.map((r) => {
+        const n = active.filter((p) => p.category === r.category).length;
+        return cardHTML({
+          href: window.PioRayonHref(r),
+          title: r.shortTitle || r.title,
+          text: n ? `${n} produit${n > 1 ? 's' : ''}` : 'Bientôt disponible'
+        }, `<svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="7" fill="${escapeHtml(r.color)}"/></svg>`);
+      }).join('');
+      return introHTML({
+        eyebrow: 'Nos rayons',
+        title: 'Tout le magasin, rayon par rayon',
+        text: 'Électroménager, ustensiles de cuisine, conserves, animalerie, cave à vin et produits frais.',
+        href: base + 'pages/rayon.html',
+        cta: 'Voir tous les rayons'
+      }) + `
+        <div class="np-body">
+          <div class="np-cards">${cards}</div>
         </div>`;
     },
 

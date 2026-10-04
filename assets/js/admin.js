@@ -174,6 +174,28 @@
   }
   productPromoCheckbox.addEventListener('change', togglePromoDates);
 
+  // Type dans le rayon (Rouge / Blanc..., Nourriture / Accessoires...) :
+  // la liste dépend de la catégorie choisie (voir assets/js/rayons.js).
+  const productTypeSelect = document.getElementById('productTypeSelect');
+  const productTypeLabel = document.getElementById('productTypeLabel');
+
+  function rayonFor(category) {
+    const c = String(category || '').trim().toLowerCase();
+    return (window.PioRayons || []).find((r) => r.category.toLowerCase() === c && r.types.length);
+  }
+
+  function refreshTypeOptions(selected) {
+    const rayon = rayonFor(productForm.elements.category.value);
+    const current = selected != null ? selected : productTypeSelect.value;
+    productTypeLabel.hidden = !rayon;
+    productTypeSelect.innerHTML = '<option value="">—</option>' + (rayon ? rayon.types : [])
+      .map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    productTypeSelect.value = rayon && rayon.types.includes(current) ? current : '';
+  }
+
+  productForm.elements.category.addEventListener('input', () => refreshTypeOptions());
+  productForm.elements.category.addEventListener('change', () => refreshTypeOptions());
+
   function openProductModal(product) {
     productForm.reset();
     productFormError.hidden = true;
@@ -188,7 +210,6 @@
       productForm.elements.image.value = product.image || '';
       productForm.elements.images.value = (product.images || []).join('\n');
       productForm.elements.group.value = product.group || '';
-      productForm.elements.wineType.value = product.wineType || '';
       productForm.elements.promo.checked = !!product.promo;
       productForm.elements.promoStart.value = product.promoStart || '';
       productForm.elements.promoEnd.value = product.promoEnd || '';
@@ -199,9 +220,11 @@
       productForm.elements.active.checked = true;
     }
     togglePromoDates();
+    refreshTypeOptions(product ? (product.wineType || product.subType || '') : '');
     const categoryList = document.getElementById('categoryList');
-    // "Cave à vin" toujours proposée, même avant la première bouteille.
-    categoryList.innerHTML = [...new Set([...knownCategories, 'Cave à vin'])].map((c) => `<option value="${escapeHtml(c)}">`).join('');
+    // Catégories des rayons (Cave à vin, Électroménager...) toujours
+    // proposées, même avant le premier produit.
+    categoryList.innerHTML = [...new Set([...knownCategories, ...(window.PioRayons || []).map((r) => r.category)])].map((c) => `<option value="${escapeHtml(c)}">`).join('');
     const groupList = document.getElementById('groupList');
     groupList.innerHTML = knownGroups.map((g) => `<option value="${escapeHtml(g)}">`).join('');
     productModal.hidden = false;
@@ -234,7 +257,10 @@
       image: raw.image,
       images: raw.images ? raw.images.split('\n').map((s) => s.trim()).filter(Boolean) : [],
       group: raw.group || '',
-      wineType: raw.wineType || '',
+      // La cave range son type dans "wineType", les autres rayons dans
+      // "subType" ; l'autre champ est vidé.
+      wineType: (rayonFor(raw.category) || {}).typeField === 'wineType' ? (raw.productType || '') : '',
+      subType: (rayonFor(raw.category) || {}).typeField === 'wineType' ? '' : (raw.productType || ''),
       promo: isPromo,
       promoStart: isPromo ? raw.promoStart : '',
       promoEnd: isPromo ? raw.promoEnd : '',

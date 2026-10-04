@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nos rayons — PRIX IMPORT OWENDO</title>
+<meta name="description" content="Les rayons de PRIX IMPORT OWENDO : électroménager, ustensiles de cuisine, conserves, animalerie, cave à vin et fraîcheur locale.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" type="image/png" href="../assets/img/logo-prix-import.png">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <p class="topbar-msg">🚚 <span id="topbarMsgText">Livraison à Owendo &amp; Libreville</span> — <strong id="topbarHighlight">Paiement Mobile Money accepté</strong></p>
+    <div class="topbar-links">
+      <a href="services.html">Livraison &amp; services</a>
+      <a href="localisation.html">Nous trouver</a>
+      <a href="../contact.html">Contact</a>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="header-main-inner">
+    <a href="../index.html" class="logo" aria-label="PRIX IMPORT OWENDO, accueil">
+      <img class="logo-mark" src="../assets/img/logo-prix-import.png" alt="Logo Prix Import">
+      <span class="logo-text">
+        <span class="l1">Prix Import</span>
+        <span class="l2">— Owendo —</span>
+      </span>
+    </a>
+
+    <form class="header-search" action="catalogue.html" method="get" role="search">
+      <input type="search" name="q" placeholder="Rechercher un produit (riz, huile, savon...)" aria-label="Rechercher un produit">
+      <button type="submit" aria-label="Rechercher">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="#fff" stroke-width="1.8"/><path d="M18 18l-4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+
+    <div class="header-actions">
+      <a href="../panier.html" class="header-icon-link" data-page="panier" aria-label="Voir le panier">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="8" cy="19" r="1.4" fill="currentColor"/><circle cx="16" cy="19" r="1.4" fill="currentColor"/><path d="M2.5 3h2l2.2 11.2a1.8 1.8 0 0 0 1.77 1.46h7.86a1.8 1.8 0 0 0 1.77-1.46L19.5 7H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="../contact.html" class="header-icon-link" data-page="contact" aria-label="Nous contacter">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 10.5C3 6.36 6.8 3 11.5 3S20 6.36 20 10.5 16.2 18 11.5 18c-.98 0-1.92-.15-2.79-.43L4 19l1.35-4.06A6.98 6.98 0 0 1 3 10.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span></button>
+  </div>
+
+  <nav class="nav-secondary">
+    <div class="nav-secondary-inner">
+      <div class="cat-dropdown" id="catDropdown">
+        <button class="cat-dropdown-btn" id="catDropdownBtn" aria-expanded="false" aria-haspopup="true" aria-controls="catDropdownPanel">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Toutes les catégories
+          <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5l3.5 3 3.5-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="cat-dropdown-panel" id="catDropdownPanel"></div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="catalogue.html" data-page="catalogue">Catalogue</a></li>
+        <li><a href="fraicheur.html" data-page="fraicheur">Fraîcheur & Local</a></li>
+        <li><a href="cave.html" data-page="cave">Cave à vin</a></li>
+        <li><a href="rayon.html" data-page="rayons">Rayons</a></li>
+        <li><a href="nouveautes.html" data-page="nouveautes">Nouveautés</a></li>
+        <li><a href="services.html" data-page="services">Services</a></li>
+        <li><a href="localisation.html" data-page="localisation">Localisation</a></li>
+      </ul>
+      <a href="localisation.html" class="btn btn-primary nav-cta">Nous trouver</a>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="catalogue.html" data-page="catalogue">Catalogue promotionnel</a></li>
+      <li><a href="fraicheur.html" data-page="fraicheur">Fraîcheur & local</a></li>
+      <li><a href="cave.html" data-page="cave">Cave à vin</a></li>
+      <li><a href="rayon.html?r=electromenager">Électroménager</a></li>
+      <li><a href="rayon.html?r=ustensiles">Ustensiles de cuisine</a></li>
+      <li><a href="rayon.html?r=conserves">Conserves</a></li>
+      <li><a href="rayon.html?r=animalerie">Animalerie (chiens)</a></li>
+      <li><a href="nouveautes.html" data-page="nouveautes">Nouveautés</a></li>
+      <li><a href="services.html" data-page="services">Services</a></li>
+      <li><a href="localisation.html" data-page="localisation">Localisation & horaires</a></li>
+    </ul>
+    <a href="localisation.html" class="btn btn-primary">Nous trouver</a>
+  </div>
+</header>
+
+<div class="page-hero rayon-hero" id="rayonHero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../index.html">Accueil</a> / <a href="rayon.html">Rayons</a><span id="rayonCrumb"></span></div>
+    <p class="eyebrow" id="rayonEyebrow">Nos rayons</p>
+    <h1 id="rayonTitle">Tous nos rayons</h1>
+    <p id="rayonText">Électroménager, ustensiles de cuisine, conserves, animalerie, cave à vin et produits frais : trouvez vite ce qu'il vous faut.</p>
+  </div>
+</div>
+
+<main>
+  <section class="section">
+    <div class="wrap">
+      <!-- Sans rayon choisi (rayon.html seul) : liste de tous les rayons. -->
+      <div class="rayon-index" id="rayonIndex" hidden></div>
+
+      <div class="search-active-bar" id="searchActiveBar" hidden></div>
+      <div class="category-filters" id="categoryFilters"></div>
+      <div class="product-grid" id="productsGrid">
+        <p class="empty-state">Chargement du rayon…</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <span class="logo-text"><span class="l1">Prix Import</span><span class="l2">— Owendo —</span></span>
+      <p id="footTagline">Supermarché de produits importés et de fraîcheur locale, situé à Owendo, Libreville. Prix bas, gros volumes, paiement Mobile Money.</p>
+    </div>
+    <div>
+      <h4>Le magasin</h4>
+      <ul>
+        <li><a href="catalogue.html">Catalogue promotionnel</a></li>
+        <li><a href="fraicheur.html">Fraîcheur & local</a></li>
+        <li><a href="cave.html">Cave à vin</a></li>
+        <li><a href="rayon.html">Tous nos rayons</a></li>
+        <li><a href="nouveautes.html">Nouveautés</a></li>
+        <li><a href="services.html">Services</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Infos pratiques</h4>
+      <ul>
+        <li><a href="localisation.html">Localisation</a></li>
+        <li><a href="localisation.html">Horaires</a></li>
+        <li><a href="services.html">Livraison</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="../contact.html">Nous écrire</a></li>
+        <li id="footAddress">Route Nationale 1, Owendo, Libreville, Gabon</li>
+        <li id="footPhone">+241 07 41 32 215</li>
+        <li id="footEmail">contact@priximport-owendo.ga</li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© 2026 Prix Import Owendo. Tous droits réservés.</span>
+    <span>Site vitrine — Owendo, Libreville, Gabon</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" aria-label="Fermer">✕</button>
+  <div class="lightbox-media"></div>
+</div>
+
+<script>window.CURRENT_PAGE = "rayons"; window.DATA_BASE = "../";</script>
+<script src="../assets/js/rayons.js"></script>
+<!-- Choisit le rayon d'après l'adresse (?r=electromenager...) et prépare
+     products.js, qui affiche ensuite les produits de ce rayon. -->
+<script src="../assets/js/rayon-page.js"></script>
+<script src="../assets/js/cart.js"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/categories.js"></script>
+<script src="../assets/js/site-content.js"></script>
+<script src="../assets/js/nav-preview.js"></script>
+<script src="../assets/js/header-slideshow.js"></script>
+<script src="../assets/js/products.js"></script>
+</body>
+</html>

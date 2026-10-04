@@ -164,7 +164,9 @@ nécessaire : on utilise un petit script Google Apps Script gratuit.
 
 ```javascript
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  // Onglet "Commandes" s'il existe, sinon le premier onglet.
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Commandes') || ss.getSheets()[0];
   var data = JSON.parse(e.postData.contents);
 
   var itemsText = data.items.map(function (i) {
@@ -215,6 +217,37 @@ automatiquement comme une nouvelle ligne dans la feuille Google Sheets.
 Si Google Sheets est injoignable (réseau, panne...), la commande du client
 n'est jamais bloquée : elle reste de toute façon enregistrée dans
 `data/orders.json`.
+
+## Passer de la démo aux vraies commandes
+
+Les commandes passées pendant les essais ne doivent pas se mélanger aux
+vraies. Le jour du lancement :
+
+**1. Vider la liste des commandes du site**
+```bash
+npm run reset-orders
+```
+Tape `OUI` pour confirmer. Les commandes de démo ne sont pas perdues : elles
+sont copiées dans `data/orders.backup-<date>.json`, puis `data/orders.json`
+repart de zéro.
+
+**2. Repartir d'une feuille Google Sheets vierge** (même lien, rien à
+changer dans `server.js`)
+1. Dans la feuille, renomme l'onglet actuel en `Démo` (clic droit sur
+   l'onglet → Renommer).
+2. Crée un nouvel onglet (bouton **+** en bas à gauche) nommé exactement
+   `Commandes`, et recopie la ligne d'en-têtes :
+   `Date | Référence | Client | Téléphone | Mode | Adresse | Articles | Total (FCFA)`
+3. **Extensions → Apps Script** : remplace la ligne
+   `var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();`
+   par les deux lignes du script ci-dessus (`getSheetByName('Commandes')`),
+   puis enregistre (icône disquette).
+4. **Déployer → Gérer les déploiements** → crayon ✏️ → *Version* :
+   **Nouvelle version** → **Déployer**. Le lien `/exec` reste le même.
+5. Passe une commande test, vérifie qu'elle arrive dans `Commandes`, puis
+   supprime cette ligne de test.
+
+L'onglet `Démo` peut être gardé pour mémoire ou supprimé.
 
 ## Application mobile (Flutter)
 

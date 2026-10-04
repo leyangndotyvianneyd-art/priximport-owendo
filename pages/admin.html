@@ -261,17 +261,12 @@
           <input type="number" name="oldPrice" min="0">
         </label>
       </div>
-      <label>Type de vin (uniquement pour la catégorie « Cave à vin »)
-        <select name="wineType">
+      <label id="productTypeLabel">Type dans le rayon
+        <select name="productType" id="productTypeSelect">
           <option value="">—</option>
-          <option value="Rouge">Rouge</option>
-          <option value="Blanc">Blanc</option>
-          <option value="Rosé">Rosé</option>
-          <option value="Champagne & mousseux">Champagne &amp; mousseux</option>
-          <option value="Spiritueux">Spiritueux</option>
         </select>
       </label>
-      <p class="admin-hint">Mets la catégorie « Cave à vin » pour qu'un produit apparaisse dans l'onglet Cave à vin du site et de l'application ; le type sert aux filtres Rouge / Blanc / Rosé...</p>
+      <p class="admin-hint" id="productTypeHint">Pour qu'un produit apparaisse dans un rayon (Cave à vin, Électroménager, Ustensiles de cuisine, Conserves, Animalerie), choisis la catégorie du même nom dans la liste ; le type sert ensuite aux filtres de ce rayon (ex. Nourriture / Accessoires pour l'animalerie).</p>
       <label>Image (URL, ou nom de fichier dans assets/img/products/)
         <input type="text" name="image" id="productImageInput">
       </label>
@@ -493,6 +488,7 @@
 
 <script>window.DATA_BASE = "../";</script>
 <script src="../assets/js/site-content.js"></script>
+<script src="../assets/js/rayons.js"></script>
 <script src="../assets/js/admin.js"></script>
 </body>
 </html>

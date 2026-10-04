@@ -5,11 +5,21 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/cart_badge_icon.dart';
+import '../widgets/pill_tabs.dart';
 import '../widgets/product_card.dart';
 import 'settings_screen.dart';
 
 class CatalogueScreen extends StatefulWidget {
-  const CatalogueScreen({super.key});
+  /// Recherche et catégorie déjà choisies (ex. depuis la barre de
+  /// recherche ou un raccourci de l'accueil).
+  final String initialQuery;
+  final String? initialCategory;
+
+  const CatalogueScreen({
+    super.key,
+    this.initialQuery = '',
+    this.initialCategory,
+  });
 
   @override
   State<CatalogueScreen> createState() => _CatalogueScreenState();
@@ -18,11 +28,34 @@ class CatalogueScreen extends StatefulWidget {
 class _CatalogueScreenState extends State<CatalogueScreen> {
   late Future<List<Product>> _future;
   String _category = 'Tous';
+  late final TextEditingController _search;
 
   @override
   void initState() {
     super.initState();
     _future = ApiService.fetchProducts();
+    _category = widget.initialCategory ?? 'Tous';
+    _search = TextEditingController(text: widget.initialQuery);
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  /// Recherche insensible aux accents et à la casse ("creme" trouve
+  /// "crème"), comme normalize() dans assets/js/products.js.
+  static String _normalize(String s) {
+    const from = 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿœæ';
+    const to = 'aaaaaaceeeeiiiinooooouuuuyyoa';
+    final lower = s.toLowerCase();
+    final b = StringBuffer();
+    for (final ch in lower.split('')) {
+      final i = from.indexOf(ch);
+      b.write(i >= 0 ? to[i] : ch);
+    }
+    return b.toString();
   }
 
   Future<void> _reload() async {
@@ -54,42 +87,58 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
             'Tous',
             ...products.map((p) => p.category),
           }.toList();
-          final filtered = _category == 'Tous'
-              ? products
-              : products.where((p) => p.category == _category).toList();
+          final needle = _normalize(_search.text.trim());
+          final filtered = products
+              .where((p) => _category == 'Tous' || p.category == _category)
+              .where((p) =>
+                  needle.isEmpty ||
+                  _normalize(p.name).contains(needle) ||
+                  _normalize(p.category).contains(needle))
+              .toList();
 
           return RefreshIndicator(
             onRefresh: _reload,
             child: Column(
               children: [
-                SizedBox(
-                  height: 48,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (context, i) {
-                      final cat = categories[i];
-                      final selected = cat == _category;
-                      return ChoiceChip(
-                        label: Text(cat),
-                        selected: selected,
-                        onSelected: (_) => setState(() => _category = cat),
-                        selectedColor: AppColors.green,
-                        labelStyle: TextStyle(
-                          color: selected ? Colors.white : AppColors.ink,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      );
-                    },
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+                  child: TextField(
+                    controller: _search,
+                    textInputAction: TextInputAction.search,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: 'Rechercher un produit (riz, huile...)',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _search.text.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () => setState(_search.clear),
+                            ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        borderSide: const BorderSide(color: AppColors.grayLight),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        borderSide:
+                            const BorderSide(color: AppColors.orange, width: 2),
+                      ),
+                    ),
                   ),
+                ),
+                PillTabs(
+                  labels: categories,
+                  selected: _category,
+                  onSelected: (cat) => setState(() => _category = cat),
                 ),
                 Expanded(
                   child: filtered.isEmpty
-                      ? const Center(
-                          child: Text('Aucun produit dans cette catégorie.'))
+                      ? Center(
+                          child: Text(needle.isEmpty
+                              ? 'Aucun produit dans cette catégorie.'
+                              : 'Aucun produit ne correspond à votre recherche.'))
                       : GridView.builder(
                           padding: const EdgeInsets.all(14),
                           gridDelegate:
@@ -97,7 +146,7 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
                             crossAxisCount: 2,
                             mainAxisSpacing: 12,
                             crossAxisSpacing: 12,
-                            childAspectRatio: 0.62,
+                            childAspectRatio: 0.64,
                           ),
                           itemCount: filtered.length,
                           itemBuilder: (context, i) =>

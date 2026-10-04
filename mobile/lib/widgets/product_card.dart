@@ -7,24 +7,57 @@ import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
 import 'image_viewer.dart';
 
-/// Carte produit du catalogue — image, nom, unité, prix (barré si promo)
-/// et bouton "Ajouter au panier", équivalent de products.js côté web.
+/// Carte produit (accueil, catalogue, cave) — grande photo, nom, prix bien
+/// visible, ancien prix barré et badge de remise si promo, bouton "+" pour
+/// ajouter au panier. Équivalent de products.js côté web.
+///
+/// La photo prend toute la place disponible : la carte s'adapte à la
+/// hauteur que lui donne la grille.
 class ProductCard extends StatelessWidget {
   final Product product;
 
   const ProductCard({super.key, required this.product});
 
+  int? get _discountPct {
+    final old = product.oldPrice;
+    if (!product.isPromoActive || old == null || old <= product.price) return null;
+    return ((1 - product.price / old) * 100).round();
+  }
+
+  void _add(BuildContext context) {
+    context.read<CartProvider>().add(product);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+          content: Text('${product.name} ajouté au panier'),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cart = context.read<CartProvider>();
+    final pct = _discountPct;
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AspectRatio(
-            aspectRatio: 1.3,
+          Expanded(
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -37,30 +70,30 @@ class ProductCard extends StatelessWidget {
                           product.imageUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            color: AppColors.grayLight,
+                            color: const Color(0xFFF3F4F6),
                             child: const Icon(Icons.image_not_supported_outlined,
                                 color: AppColors.gray),
                           ),
                         ),
                       )
-                    : Container(color: AppColors.grayLight),
+                    : Container(color: const Color(0xFFF3F4F6)),
                 if (product.isPromoActive)
                   Positioned(
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.orange,
-                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFFE53935),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
-                        'PROMO',
-                        style: TextStyle(
+                      child: Text(
+                        pct != null && pct > 0 ? '-$pct %' : 'PROMO',
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
@@ -69,7 +102,7 @@ class ProductCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+            padding: const EdgeInsets.fromLTRB(10, 8, 8, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,62 +110,68 @@ class ProductCard extends StatelessWidget {
                   product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontSize: 13.5),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  product.unit,
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.gray),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.25,
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    if (product.isPromoActive && product.oldPrice != null)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: Text(
-                          formatFcfa(product.oldPrice!),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.gray,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      ),
                     Expanded(
-                      child: Text(
-                        formatFcfa(product.price),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.green,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            formatFcfa(product.price),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: product.isPromoActive
+                                  ? const Color(0xFFE53935)
+                                  : AppColors.ink,
+                            ),
+                          ),
+                          if (product.isPromoActive && product.oldPrice != null)
+                            Text(
+                              formatFcfa(product.oldPrice!),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.gray,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            )
+                          else if (product.unit.isNotEmpty)
+                            Text(
+                              product.unit,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 11, color: AppColors.gray),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Material(
+                      color: AppColors.orange,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => _add(context),
+                        child: const Padding(
+                          padding: EdgeInsets.all(7),
+                          child: Icon(Icons.add_shopping_cart,
+                              color: Colors.white, size: 18),
                         ),
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      textStyle: const TextStyle(fontSize: 12.5),
-                    ),
-                    onPressed: () {
-                      cart.add(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          duration: const Duration(seconds: 1),
-                          content: Text('${product.name} ajouté au panier'),
-                        ),
-                      );
-                    },
-                    child: const Text('Ajouter'),
-                  ),
                 ),
               ],
             ),

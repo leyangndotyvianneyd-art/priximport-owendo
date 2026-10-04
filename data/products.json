@@ -170,5 +170,35 @@
     "category": "Fraîcheur & Local",
     "image": "https://cdn.metro-online.com/-/media/Project/MCW/FR_Metro/Images/services-inspirations/metro/univers-produits/maree/OpenGraph/maree.jpg?rev=f0570d86879744ff8aed1a9ab6fcd066",
     "active": true
+  },
+  {
+    "id": "bordeau-chateau-lafitte-2020",
+    "name": "Bordeau château Lafitte 2020",
+    "unit": "75cl",
+    "price": 8500,
+    "promo": false,
+    "category": "Cave à vin",
+    "image": "assets/img/products/chateau-lafitte-2020-musxlwsr.jpg",
+    "active": true
+  },
+  {
+    "id": "chenet-rouge",
+    "name": "chenet rouge",
+    "unit": "3Le",
+    "price": 17500,
+    "promo": false,
+    "category": "Cave à vin",
+    "image": "assets/img/products/chenet-rouge-musxvpxk.jpg",
+    "active": true
+  },
+  {
+    "id": "champagne-moe-et-chandon",
+    "name": "champagne moe et chandon",
+    "unit": "75cl",
+    "price": 136500,
+    "promo": false,
+    "category": "Cave à vin",
+    "image": "assets/img/products/champagne-musxxynn.jpg",
+    "active": true
   }
 ]

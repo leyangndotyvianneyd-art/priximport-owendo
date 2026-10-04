@@ -41,6 +41,8 @@
 
   function resolveImage(image) {
     if (!image) return '';
+    // Photo envoyée depuis l'admin : chemin déjà complet (assets/...).
+    if (/^assets\//.test(image)) return dataBase + image;
     return /^https?:\/\//.test(image) ? image : `${dataBase}assets/img/products/${image}`;
   }
 
@@ -125,16 +127,16 @@
       const promoActive = isPromoActive(p);
       return `
       <div class="product-card">
-        ${promoActive ? '<span class="badge-promo">Promo</span>' : ''}
+        ${promoActive ? `<span class="badge-promo">${p.oldPrice > p.price ? `-${Math.round((1 - p.price / p.oldPrice) * 100)} %` : 'Promo'}</span>` : ''}
         <div class="product-image" style="background-image:url('${resolveImage(p.image)}')" data-zoom-id="${p.id}" role="button" tabindex="0" aria-label="Voir la photo de ${p.name} en grand"></div>
         <div class="product-body">
           <p class="product-category">${(fixedCategory && p[filterField]) || p.category}</p>
           <h3>${p.name}</h3>
-          <div class="product-price">
+          <div class="product-price${promoActive ? ' is-promo' : ''}">
             <span class="price">${formatPrice(p.price)}</span>
             ${promoActive && p.oldPrice ? `<span class="price-old">${formatPrice(p.oldPrice)}</span>` : ''}
           </div>
-          <p class="product-unit">Prix / ${p.unit}</p>
+          <p class="product-unit">${p.unit}</p>
           <button type="button" class="btn btn-primary btn-add-cart" data-id="${p.id}">Ajouter au panier</button>
         </div>
       </div>

@@ -8,7 +8,9 @@ import '../models/product.dart';
 import '../models/site_content.dart';
 import '../screens/cart_screen.dart';
 import '../screens/catalogue_screen.dart';
+import '../models/rayon.dart';
 import '../screens/cave_screen.dart';
+import '../screens/rayon_screen.dart';
 import '../screens/contact_screen.dart';
 import '../screens/fraicheur_screen.dart';
 import '../screens/localisation_screen.dart';
@@ -31,7 +33,7 @@ class HomeSlider extends StatefulWidget {
 }
 
 class _HomeSliderState extends State<HomeSlider> {
-  static const double _height = 320;
+  static const double _height = 270;
 
   final _controller = PageController();
   List<_Slide> _slides = [_Slide.welcome()];
@@ -223,7 +225,9 @@ class _HomeSliderState extends State<HomeSlider> {
       return;
     }
     final page = href.split(RegExp(r'[?#]')).first;
+    final rayon = Rayons.forSlug(Uri.tryParse(href)?.queryParameters['r'] ?? '');
     final Widget? screen = switch (page) {
+      _ when page.contains('rayon') && rayon != null => RayonScreen(rayon: rayon),
       _ when page.contains('catalogue') => const CatalogueScreen(),
       _ when page.contains('fraicheur') => const FraicheurScreen(),
       _ when page.contains('cave') => const CaveScreen(),
@@ -420,7 +424,7 @@ class _SlideView extends StatelessWidget {
     final hasVisual = slide.image != null || slide.showServices;
     return Container(
       decoration: _background,
-      padding: const EdgeInsets.fromLTRB(22, 26, 22, 36),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
       child: Row(
         children: [
           Expanded(
@@ -469,7 +473,7 @@ class _SlideView extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 36),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
             child: Row(
               children: [
                 Expanded(
@@ -587,11 +591,11 @@ class _Copy extends StatelessWidget {
         if (slide.title.isNotEmpty)
           Text(
             slide.title,
-            maxLines: 3,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: color,
-              fontSize: slide.key == 'welcome' ? 28 : 21,
+              fontSize: slide.key == 'welcome' ? 24 : 20,
               fontWeight: FontWeight.w900,
               height: 1.15,
             ),
@@ -618,7 +622,7 @@ class _Copy extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             slide.text,
-            maxLines: 4,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: color.withValues(alpha: 0.8),

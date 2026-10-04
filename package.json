@@ -7,7 +7,8 @@
     "start": "node server.js",
     "preview": "live-server --port=5500",
     "create-admin": "node scripts/create-admin.js",
-    "remove-test-videos": "node scripts/remove-test-videos.js"
+    "remove-test-videos": "node scripts/remove-test-videos.js",
+    "reset-orders": "node scripts/reset-orders.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
