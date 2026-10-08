@@ -38,6 +38,12 @@ window.Cart = (function () {
         image: product.image,
         qty
       });
+      // Produit importé sur commande : le panier affiche son délai et
+      // calcule l'acompte (voir window.PioImport dans rayons.js).
+      const imp = window.PioImport;
+      if (imp && product.category === imp.category) {
+        items[items.length - 1].leadTime = product.leadTime || imp.defaultLeadTime;
+      }
     }
     write(items);
   }

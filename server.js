@@ -108,6 +108,13 @@ const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const POSTS_FILE = path.join(DATA_DIR, 'posts.json');
 const ADMINS_FILE = path.join(DATA_DIR, 'admins.json');
+
+// Produits « Import sur commande » : commandés chez le fournisseur après la
+// commande du client, avec un acompte. Mêmes valeurs que window.PioImport
+// (assets/js/rayons.js) et l'appli (mobile/lib/models/product.dart).
+const IMPORT_CATEGORY = 'Import sur commande';
+const IMPORT_DEFAULT_LEAD_TIME = '3 à 5 semaines';
+const IMPORT_DEPOSIT_RATE = 0.5;
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 
 // URL du "Web App" Google Apps Script qui reçoit chaque commande et l'ajoute
@@ -245,13 +252,17 @@ app.post('/api/commande', async (req, res) => {
     if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
       return res.status(400).json({ error: `Quantité invalide pour « ${product.name} ».` });
     }
-    items.push({ id: product.id, name: product.name, price: Number(product.price) || 0, qty });
+    const item = { id: product.id, name: product.name, price: Number(product.price) || 0, qty };
+    if (product.category === IMPORT_CATEGORY) item.leadTime = product.leadTime || IMPORT_DEFAULT_LEAD_TIME;
+    items.push(item);
   }
 
   const reference = 'PIO-' + Date.now().toString(36).toUpperCase();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const importTotal = items.filter((i) => i.leadTime).reduce((sum, i) => sum + i.price * i.qty, 0);
+  const deposit = Math.round(importTotal * IMPORT_DEPOSIT_RATE);
 
-  const order = { reference, date: new Date().toISOString(), customer, items, total };
+  const order = { reference, date: new Date().toISOString(), customer, items, total, ...(deposit ? { deposit } : {}) };
 
   fs.readFile(ORDERS_FILE, 'utf8', (err, data) => {
     let orders = [];
@@ -270,8 +281,9 @@ app.post('/api/commande', async (req, res) => {
       console.log(`    Articles : ${itemsSummary}`);
       if (customer.address) console.log(`    Adresse : ${customer.address}`);
       console.log(`    Total : ${total.toLocaleString('fr-FR')} FCFA`);
+      if (deposit) console.log(`    Import sur commande — acompte : ${deposit.toLocaleString('fr-FR')} FCFA`);
       sendOrderToGoogleSheet(order);
-      res.json({ success: true, reference, total, items });
+      res.json({ success: true, reference, total, deposit, items });
     });
   });
 });
@@ -429,6 +441,7 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       ...(p.group ? { group: String(p.group).trim() } : {}),
       ...(p.wineType ? { wineType: String(p.wineType).trim() } : {}),
       ...(p.subType ? { subType: String(p.subType).trim() } : {}),
+      ...(p.leadTime ? { leadTime: String(p.leadTime).trim().slice(0, 60) } : {}),
       ...(Array.isArray(p.images) && p.images.length ? { images: p.images.map((i) => String(i).trim()).filter(Boolean) } : {}),
       active: p.active !== false
     };
@@ -476,6 +489,10 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
     if (p.subType != null) {
       if (p.subType === '') delete updated.subType;
       else updated.subType = String(p.subType).trim();
+    }
+    if (p.leadTime != null) {
+      if (p.leadTime === '') delete updated.leadTime;
+      else updated.leadTime = String(p.leadTime).trim().slice(0, 60);
     }
     if (p.images != null) {
       const images = Array.isArray(p.images) ? p.images.map((i) => String(i).trim()).filter(Boolean) : [];

@@ -23,6 +23,7 @@ class CartItem {
         'price': product.price,
         'category': product.category,
         'image': product.image,
+        if (product.leadTime != null) 'leadTime': product.leadTime,
         'qty': qty,
       };
 }

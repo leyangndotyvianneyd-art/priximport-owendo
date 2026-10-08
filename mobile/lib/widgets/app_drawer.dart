@@ -134,4 +134,4 @@ class AppDrawer extends StatelessWidget {
 }
 
 /// À garder identique au champ "version" de pubspec.yaml.
-const appVersion = '1.8.0';
+const appVersion = '1.9.0';

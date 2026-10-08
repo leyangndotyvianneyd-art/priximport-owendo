@@ -266,7 +266,13 @@
           <option value="">—</option>
         </select>
       </label>
-      <p class="admin-hint" id="productTypeHint">Pour qu'un produit apparaisse dans un rayon (Cave à vin, Électroménager, Ustensiles de cuisine, Conserves, Animalerie), choisis la catégorie du même nom dans la liste ; le type sert ensuite aux filtres de ce rayon (ex. Nourriture / Accessoires pour l'animalerie).</p>
+      <p class="admin-hint" id="productTypeHint">Pour qu'un produit apparaisse dans un rayon (Cave à vin, Électroménager, Ustensiles de cuisine, Charcuterie, Conserves, Animalerie, Import sur commande), choisis la catégorie du même nom dans la liste ; le type sert ensuite aux filtres de ce rayon (ex. Nourriture / Accessoires pour l'animalerie).</p>
+      <div id="productLeadTimeWrap" hidden>
+        <label>Délai de livraison (import sur commande)
+          <input type="text" name="leadTime" placeholder="3 à 5 semaines">
+        </label>
+        <p class="admin-hint">Affiché sur la fiche du produit. Laisse vide pour le délai par défaut (3 à 5 semaines). Le client verse un acompte de 50 % à la commande.</p>
+      </div>
       <label>Image (URL, ou nom de fichier dans assets/img/products/)
         <input type="text" name="image" id="productImageInput">
       </label>

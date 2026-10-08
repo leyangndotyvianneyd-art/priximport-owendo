@@ -85,6 +85,7 @@ class _CartScreenState extends State<CartScreen> {
         'success': true,
         'reference': _generateOfflineReference(),
         'total': total,
+        'deposit': cart.deposit,
         'offline': true,
       };
     }
@@ -99,9 +100,12 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _confirmOnWhatsApp(CartProvider cart, String reference) async {
     final total = _confirmation?['total'] ?? 0;
+    final deposit = _confirmation?['deposit'];
+    final hasDeposit = deposit is num && deposit > 0;
     final text = Uri.encodeComponent(
       'Bonjour, je confirme ma commande $reference '
-      '(${formatFcfa(total is num ? total : 0)}) — ${_nameCtrl.text.trim()}.',
+      '(${formatFcfa(total is num ? total : 0)}) — ${_nameCtrl.text.trim()}.'
+      '${hasDeposit ? ' Acompte à verser pour les produits importés sur commande : ${formatFcfa(deposit)}.' : ''}',
     );
     String shopPhone = fallbackShopPhone;
     try {
@@ -178,7 +182,18 @@ class _CartScreenState extends State<CartScreen> {
               ),
               title: Text(item.product.name,
                   style: const TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(formatFcfa(item.product.price)),
+              subtitle: item.product.importLeadTime == null
+                  ? Text(formatFcfa(item.product.price))
+                  : Text.rich(TextSpan(children: [
+                      TextSpan(text: '${formatFcfa(item.product.price)}\n'),
+                      TextSpan(
+                        text: 'Sur commande · sous ${item.product.importLeadTime}',
+                        style: const TextStyle(
+                            color: AppColors.importPurple,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12),
+                      ),
+                    ])),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -209,6 +224,37 @@ class _CartScreenState extends State<CartScreen> {
                     color: AppColors.green)),
           ],
         ),
+        if (cart.deposit > 0) ...[
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Acompte à verser',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.importPurple)),
+              Text(formatFcfa(cart.deposit),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.importPurple)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3EEFF),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'Votre panier contient des produits importés sur commande '
+              '(délai : ${cart.importLeadTimes.join(', ')}). Nous les '
+              "commandons dès réception de l'acompte ; le reste est payé à "
+              'la livraison.',
+              style: const TextStyle(fontSize: 12.5, color: Color(0xFF4C1D95)),
+            ),
+          ),
+        ],
         const Divider(height: 32),
         Text('Vos coordonnées', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
@@ -288,6 +334,17 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 8),
             Text('Référence : $reference',
                 style: const TextStyle(fontWeight: FontWeight.w600)),
+            if (_confirmation?['deposit'] is num &&
+                _confirmation!['deposit'] > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Acompte à verser : ${formatFcfa(_confirmation!['deposit'])}\n'
+                "Le magasin vous indiquera sur WhatsApp comment le verser, "
+                "puis lancera l'import de vos produits.",
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppColors.importPurple, fontSize: 13),
+              ),
+            ],
             if (offline) ...[
               const SizedBox(height: 8),
               const Text(

@@ -169,7 +169,7 @@
       return introHTML({
         eyebrow: 'Nos rayons',
         title: 'Tout le magasin, rayon par rayon',
-        text: 'Électroménager, ustensiles de cuisine, conserves, animalerie, cave à vin et produits frais.',
+        text: 'Électroménager, ustensiles de cuisine, charcuterie, conserves, animalerie, cave à vin et produits frais.',
         href: base + 'pages/rayon.html',
         cta: 'Voir tous les rayons'
       }) + `

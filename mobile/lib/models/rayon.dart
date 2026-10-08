@@ -84,6 +84,23 @@ class Rayons {
     ],
   );
 
+  static const charcuterie = Rayon(
+    slug: 'charcuterie',
+    category: 'Charcuterie',
+    title: 'Charcuterie',
+    text: 'Jambons, saucissons, salamis, saucisses, pâtés et lardons, pour '
+        'vos sandwichs, apéritifs et petits plats.',
+    color: Color(0xFFBE185D),
+    icon: Icons.kebab_dining_outlined,
+    types: [
+      'Jambons',
+      'Saucissons & salamis',
+      'Saucisses',
+      'Pâtés & terrines',
+      'Lardons & bacon',
+    ],
+  );
+
   static const conserves = Rayon(
     slug: 'conserves',
     category: 'Conserves',
@@ -107,8 +124,33 @@ class Rayons {
     types: ['Nourriture', 'Friandises', 'Accessoires', 'Hygiène & soins'],
   );
 
+  static const importOnDemand = Rayon(
+    slug: 'import',
+    category: ImportOnDemand.category,
+    title: 'Import sur commande',
+    text: "Des produits que nous faisons venir spécialement pour vous depuis "
+        "nos fournisseurs à l'étranger. Acompte de 50 % à la commande, le "
+        'reste à la livraison.',
+    color: Color(0xFF7C3AED),
+    icon: Icons.flight_land_outlined,
+    types: [
+      'Maison & déco',
+      'Électronique',
+      'Mode & beauté',
+      'Équipement professionnel',
+    ],
+  );
+
   /// Rayons qui ont leur écran (la Fraîcheur a le sien, à part).
-  static const all = [cave, electromenager, ustensiles, conserves, animalerie];
+  static const all = [
+    cave,
+    electromenager,
+    ustensiles,
+    charcuterie,
+    conserves,
+    animalerie,
+    importOnDemand,
+  ];
 
   static Rayon? forCategory(String category) {
     for (final r in all) {

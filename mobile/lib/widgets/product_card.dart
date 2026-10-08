@@ -40,6 +40,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = _discountPct;
+    final leadTime = product.importLeadTime;
 
     return Container(
       decoration: BoxDecoration(
@@ -98,6 +99,27 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                if (leadTime != null)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.importPurple,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'Sur commande',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -137,7 +159,17 @@ class ProductCard extends StatelessWidget {
                                   : AppColors.ink,
                             ),
                           ),
-                          if (product.isPromoActive && product.oldPrice != null)
+                          if (leadTime != null)
+                            Text(
+                              'Sous $leadTime',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.importPurple),
+                            )
+                          else if (product.isPromoActive && product.oldPrice != null)
                             Text(
                               formatFcfa(product.oldPrice!),
                               style: const TextStyle(

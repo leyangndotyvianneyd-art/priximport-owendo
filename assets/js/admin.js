@@ -196,6 +196,15 @@
   productForm.elements.category.addEventListener('input', () => refreshTypeOptions());
   productForm.elements.category.addEventListener('change', () => refreshTypeOptions());
 
+  // Le délai de livraison ne concerne que les produits importés sur commande.
+  function toggleLeadTime() {
+    const imp = window.PioImport;
+    document.getElementById('productLeadTimeWrap').hidden =
+      !imp || productForm.elements.category.value.trim() !== imp.category;
+  }
+  productForm.elements.category.addEventListener('input', toggleLeadTime);
+  productForm.elements.category.addEventListener('change', toggleLeadTime);
+
   function openProductModal(product) {
     productForm.reset();
     productFormError.hidden = true;
@@ -210,6 +219,7 @@
       productForm.elements.image.value = product.image || '';
       productForm.elements.images.value = (product.images || []).join('\n');
       productForm.elements.group.value = product.group || '';
+      productForm.elements.leadTime.value = product.leadTime || '';
       productForm.elements.promo.checked = !!product.promo;
       productForm.elements.promoStart.value = product.promoStart || '';
       productForm.elements.promoEnd.value = product.promoEnd || '';
@@ -220,6 +230,7 @@
       productForm.elements.active.checked = true;
     }
     togglePromoDates();
+    toggleLeadTime();
     refreshTypeOptions(product ? (product.wineType || product.subType || '') : '');
     const categoryList = document.getElementById('categoryList');
     // Catégories des rayons (Cave à vin, Électroménager...) toujours
@@ -257,6 +268,7 @@
       image: raw.image,
       images: raw.images ? raw.images.split('\n').map((s) => s.trim()).filter(Boolean) : [],
       group: raw.group || '',
+      leadTime: window.PioImport && raw.category.trim() === window.PioImport.category ? (raw.leadTime || '').trim() : '',
       // La cave range son type dans "wineType", les autres rayons dans
       // "subType" ; l'autre champ est vidé.
       wineType: (rayonFor(raw.category) || {}).typeField === 'wineType' ? (raw.productType || '') : '',
