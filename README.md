@@ -138,26 +138,6 @@ Le grand bandeau qui défile en haut de l'accueil se gère dans l'onglet
 
 Tout est enregistré dans `data/content.json` (clé `heroSlider`).
 
-## Import sur commande (produits Alibaba, AliExpress...)
-
-Le rayon **Import sur commande** sert à vendre des produits qui ne sont pas
-en stock : le client commande et verse un acompte, puis tu commandes chez le
-fournisseur et le fais venir au Gabon.
-
-- Dans l'admin, crée le produit avec la catégorie **Import sur commande**
-  et **ton** prix de vente (prix fournisseur + transport + douane + marge).
-- Le champ **Délai de livraison** apparaît alors ; laisse-le vide pour le
-  délai par défaut (3 à 5 semaines).
-- Sur le site et l'appli, ces produits ont un badge « Sur commande » et leur
-  délai. Le panier affiche l'**acompte de 50 %** à verser ; il est aussi
-  enregistré dans la commande (champ `deposit`) et indiqué dans le message
-  WhatsApp.
-
-Pour changer le délai par défaut ou le taux d'acompte, modifie les mêmes
-valeurs à trois endroits : `window.PioImport` dans `assets/js/rayons.js`,
-les constantes `IMPORT_*` en haut de `server.js` et la classe
-`ImportOnDemand` dans `mobile/lib/models/product.dart`.
-
 ## Où sont enregistrées les commandes ?
 
 Dans `data/orders.json`, uniquement quand le site tourne via `npm start`

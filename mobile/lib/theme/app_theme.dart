@@ -14,9 +14,6 @@ class AppColors {
   static const ink = Color(0xFF1A1A1A);
   static const gray = Color(0xFF6B7280);
   static const grayLight = Color(0xFFE5E7EB);
-
-  /// Produits « Import sur commande » (badge, délai, acompte).
-  static const importPurple = Color(0xFF7C3AED);
 }
 
 class AppTheme {

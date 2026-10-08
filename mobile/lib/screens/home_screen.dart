@@ -386,8 +386,6 @@ class _Shortcuts extends StatelessWidget {
           () => onOpen(const RayonScreen(rayon: Rayons.conserves))),
       (Icons.pets, const Color(0xFF0F766E), 'Animalerie\n(chiens)',
           () => onOpen(const RayonScreen(rayon: Rayons.animalerie))),
-      (Icons.flight_land, AppColors.importPurple, 'Import sur\ncommande',
-          () => onOpen(const RayonScreen(rayon: Rayons.importOnDemand))),
       (Icons.photo_library, const Color(0xFF2563EB), 'Nouveautés\n& arrivages',
           () => onOpen(const NouveautesScreen())),
       (Icons.local_shipping, const Color(0xFF7C3AED), 'Livraison\n& services',

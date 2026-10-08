@@ -68,27 +68,8 @@ window.PioRayons = [
     text: 'Croquettes, pâtées, friandises, colliers, laisses, gamelles et produits de soin pour votre chien.',
     color: '#0F766E',
     types: ['Nourriture', 'Friandises', 'Accessoires', 'Hygiène & soins']
-  },
-  {
-    slug: 'import',
-    category: 'Import sur commande',
-    title: 'Import sur commande',
-    text: "Des produits que nous faisons venir spécialement pour vous depuis nos fournisseurs à l'étranger. Acompte de 50 % à la commande, le reste à la livraison.",
-    color: '#7C3AED',
-    types: ['Maison & déco', 'Électronique', 'Mode & beauté', 'Équipement professionnel']
   }
 ];
-
-// Produits « Import sur commande » : pas en stock, commandés chez le
-// fournisseur après la commande du client. Ils affichent un délai (champ
-// "leadTime" du produit, sinon le délai par défaut) et le panier demande un
-// acompte sur leur montant. Mêmes valeurs dans server.js et dans
-// mobile/lib/models/product.dart — à garder identiques.
-window.PioImport = {
-  category: 'Import sur commande',
-  defaultLeadTime: '3 à 5 semaines',
-  depositRate: 0.5
-};
 
 // Adresse de la page d'un rayon, depuis la racine du site.
 window.PioRayonHref = function (r) {

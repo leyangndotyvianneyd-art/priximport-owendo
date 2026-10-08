@@ -20,21 +20,6 @@ class CartProvider extends ChangeNotifier {
 
   num get total => _items.fold(0, (sum, i) => sum + i.subtotal);
 
-  /// Acompte à verser sur les produits importés sur commande (le serveur
-  /// refait le même calcul).
-  num get deposit => (_items
-              .where((i) => i.product.importLeadTime != null)
-              .fold<num>(0, (sum, i) => sum + i.subtotal) *
-          ImportOnDemand.depositRate)
-      .round();
-
-  /// Délais des produits importés sur commande présents dans le panier.
-  List<String> get importLeadTimes => _items
-      .map((i) => i.product.importLeadTime)
-      .whereType<String>()
-      .toSet()
-      .toList();
-
   bool get isEmpty => _items.isEmpty;
 
   CartProvider() {
@@ -56,7 +41,6 @@ class CartProvider extends ChangeNotifier {
             price: (map['price'] as num?) ?? 0,
             category: map['category']?.toString() ?? '',
             image: map['image']?.toString() ?? '',
-            leadTime: map['leadTime']?.toString(),
           );
           _items.add(CartItem(product: product, qty: (map['qty'] as num?)?.toInt() ?? 1));
         }

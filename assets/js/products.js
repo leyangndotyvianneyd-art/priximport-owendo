@@ -65,14 +65,6 @@
     return true;
   }
 
-  // Produit importé sur commande (voir window.PioImport dans rayons.js) :
-  // renvoie son délai de livraison, ou null pour un produit en stock.
-  function importLeadTime(p) {
-    const imp = window.PioImport;
-    if (!imp || p.category !== imp.category) return null;
-    return p.leadTime || imp.defaultLeadTime;
-  }
-
   function renderFilters(categories) {
     if (!filtersWrap) return;
     if (!categories.length) {
@@ -133,10 +125,8 @@
 
     grid.innerHTML = filtered.map(p => {
       const promoActive = isPromoActive(p);
-      const leadTime = importLeadTime(p);
       return `
       <div class="product-card">
-        ${leadTime ? '<span class="badge-import">Sur commande</span>' : ''}
         ${promoActive ? `<span class="badge-promo">${p.oldPrice > p.price ? `-${Math.round((1 - p.price / p.oldPrice) * 100)} %` : 'Promo'}</span>` : ''}
         <div class="product-image" style="background-image:url('${resolveImage(p.image)}')" data-zoom-id="${p.id}" role="button" tabindex="0" aria-label="Voir la photo de ${p.name} en grand"></div>
         <div class="product-body">
@@ -147,8 +137,7 @@
             ${promoActive && p.oldPrice ? `<span class="price-old">${formatPrice(p.oldPrice)}</span>` : ''}
           </div>
           <p class="product-unit">${p.unit}</p>
-          ${leadTime ? `<p class="product-lead-time">Livraison sous ${leadTime} · acompte ${Math.round(window.PioImport.depositRate * 100)} %</p>` : ''}
-          <button type="button" class="btn btn-primary btn-add-cart" data-id="${p.id}">${leadTime ? 'Commander' : 'Ajouter au panier'}</button>
+          <button type="button" class="btn btn-primary btn-add-cart" data-id="${p.id}">Ajouter au panier</button>
         </div>
       </div>
     `;

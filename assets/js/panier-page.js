@@ -18,14 +18,6 @@
     return /^https?:\/\//.test(image) ? image : `assets/img/products/${image}`;
   }
 
-  // Acompte demandé sur les produits importés sur commande (ceux qui ont un
-  // délai, voir cart.js). Le serveur refait le même calcul.
-  function depositFor(items) {
-    const rate = (window.PioImport && window.PioImport.depositRate) || 0.5;
-    const importTotal = items.filter(i => i.leadTime).reduce((s, i) => s + i.qty * i.price, 0);
-    return Math.round(importTotal * rate);
-  }
-
   function render() {
     const items = window.Cart.getAll();
 
@@ -39,8 +31,6 @@
     }
 
     const total = window.Cart.getTotal();
-    const deposit = depositFor(items);
-    const leadTimes = [...new Set(items.filter(i => i.leadTime).map(i => i.leadTime))];
 
     container.innerHTML = `
       <div class="cart-layout">
@@ -51,7 +41,6 @@
               <div class="cart-info">
                 <h4>${item.name}</h4>
                 <span>${item.unit} — ${formatPrice(item.price)}</span>
-                ${item.leadTime ? `<span class="cart-lead-time">Import sur commande · livraison sous ${item.leadTime}</span>` : ''}
               </div>
               <div class="cart-qty">
                 <button type="button" data-action="dec" aria-label="Diminuer">−</button>
@@ -68,9 +57,6 @@
           <h3>Récapitulatif</h3>
           <div class="line"><span>Articles</span><span>${items.reduce((s, i) => s + i.qty, 0)}</span></div>
           <div class="total"><span>Total</span><span>${formatPrice(total)}</span></div>
-          ${deposit ? `
-          <div class="line is-deposit"><span>Acompte à verser</span><span>${formatPrice(deposit)}</span></div>
-          <p class="cart-import-note">Votre panier contient des produits importés sur commande (délai : ${leadTimes.join(', ')}). Nous les commandons dès réception de l'acompte ; le reste est payé à la livraison.</p>` : ''}
 
           <form id="orderForm">
             <label for="custName">Nom complet</label>
@@ -138,7 +124,7 @@
           return;
         }
         // Le serveur renvoie les articles et le total au prix du catalogue.
-        showConfirmation(data.reference, customer, data.items || items, data.total, data.deposit);
+        showConfirmation(data.reference, customer, data.items || items, data.total);
         window.Cart.clear();
       })
       .catch(() => {
@@ -150,12 +136,11 @@
       });
   }
 
-  function showConfirmation(reference, customer, items, serverTotal, serverDeposit) {
+  function showConfirmation(reference, customer, items, serverTotal) {
     const total = typeof serverTotal === 'number' ? serverTotal : items.reduce((s, i) => s + i.qty * i.price, 0);
-    const deposit = typeof serverDeposit === 'number' ? serverDeposit : depositFor(items);
-    const lines = items.map(i => `• ${i.qty} x ${i.name}${i.leadTime ? ' (import sur commande)' : ''}`).join('\n');
+    const lines = items.map(i => `• ${i.qty} x ${i.name}`).join('\n');
     const message = encodeURIComponent(
-      `Bonjour Prix Import Owendo, je viens de passer la commande ${reference} (${customer.mode}) :\n${lines}\nTotal : ${formatPrice(total)}${deposit ? `\nAcompte à verser : ${formatPrice(deposit)}` : ''}\nNom : ${customer.name} — Tél : ${customer.phone}${customer.address ? ' — Adresse : ' + customer.address : ''}`
+      `Bonjour Prix Import Owendo, je viens de passer la commande ${reference} (${customer.mode}) :\n${lines}\nTotal : ${formatPrice(total)}\nNom : ${customer.name} — Tél : ${customer.phone}${customer.address ? ' — Adresse : ' + customer.address : ''}`
     );
 
     container.innerHTML = `
@@ -164,10 +149,7 @@
         <p>Référence de commande</p>
         <span class="ref">${reference}</span>
         <p>Total : <strong>${formatPrice(total)}</strong></p>
-        ${deposit ? `<p>Acompte à verser : <strong>${formatPrice(deposit)}</strong></p>` : ''}
-        <p style="margin: 18px 0; color: var(--gray);">${deposit
-          ? "Confirmez votre commande sur WhatsApp : le magasin vous indiquera comment verser l'acompte, puis lancera l'import de vos produits."
-          : 'Confirmez votre commande sur WhatsApp pour que le magasin la prépare tout de suite.'}</p>
+        <p style="margin: 18px 0; color: var(--gray);">Confirmez votre commande sur WhatsApp pour que le magasin la prépare tout de suite.</p>
         <a class="btn btn-whatsapp" href="https://wa.me/${SHOP_PHONE}?text=${message}" target="_blank" rel="noopener">Confirmer sur WhatsApp</a>
         <p style="margin-top: 24px;"><a href="pages/catalogue.html">← Continuer mes achats</a></p>
       </div>`;

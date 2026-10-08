@@ -124,23 +124,6 @@ class Rayons {
     types: ['Nourriture', 'Friandises', 'Accessoires', 'Hygiène & soins'],
   );
 
-  static const importOnDemand = Rayon(
-    slug: 'import',
-    category: ImportOnDemand.category,
-    title: 'Import sur commande',
-    text: "Des produits que nous faisons venir spécialement pour vous depuis "
-        "nos fournisseurs à l'étranger. Acompte de 50 % à la commande, le "
-        'reste à la livraison.',
-    color: Color(0xFF7C3AED),
-    icon: Icons.flight_land_outlined,
-    types: [
-      'Maison & déco',
-      'Électronique',
-      'Mode & beauté',
-      'Équipement professionnel',
-    ],
-  );
-
   /// Rayons qui ont leur écran (la Fraîcheur a le sien, à part).
   static const all = [
     cave,
@@ -149,7 +132,6 @@ class Rayons {
     charcuterie,
     conserves,
     animalerie,
-    importOnDemand,
   ];
 
   static Rayon? forCategory(String category) {

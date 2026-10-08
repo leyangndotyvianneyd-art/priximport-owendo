@@ -2274,36 +2274,6 @@ footer ul a:hover { color: var(--yellow); }
 .product-price.is-promo .price { color: #E53935; }
 .price-old { font-size: 0.8rem; }
 .product-unit { font-size: 0.76rem; margin-bottom: 10px; }
-/* Produits « Import sur commande » : badge à droite (la promo est à gauche) */
-.badge-import {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  background: #7C3AED;
-  color: #fff;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-.product-lead-time {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #7C3AED;
-  margin: -6px 0 10px;
-}
-.cart-lead-time { display: block; color: #7C3AED; font-weight: 600; font-size: 0.8rem; }
-.cart-summary .line.is-deposit { color: #7C3AED; font-weight: 700; }
-.cart-import-note {
-  margin: 10px 0 4px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #F3EEFF;
-  color: #4C1D95;
-  font-size: 0.82rem;
-  line-height: 1.4;
-}
 .btn-add-cart {
   padding: 9px 12px;
   font-size: 0.85rem;

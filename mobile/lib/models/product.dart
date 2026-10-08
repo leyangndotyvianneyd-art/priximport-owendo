@@ -1,14 +1,5 @@
 import '../services/api_service.dart';
 
-/// Produits « Import sur commande » : pas en stock, commandés chez le
-/// fournisseur après la commande du client, avec un acompte. Mêmes valeurs
-/// que window.PioImport (assets/js/rayons.js) et server.js.
-class ImportOnDemand {
-  static const category = 'Import sur commande';
-  static const defaultLeadTime = '3 à 5 semaines';
-  static const depositRate = 0.5;
-}
-
 /// Modèle produit — mêmes champs que data/products.json côté serveur,
 /// pour rester compatible avec le catalogue déjà utilisé par le site web.
 class Product {
@@ -32,10 +23,6 @@ class Product {
   final String image;
   final bool active;
 
-  /// Délai de livraison d'un produit importé sur commande (sinon le délai
-  /// par défaut, voir [importLeadTime]).
-  final String? leadTime;
-
   Product({
     required this.id,
     required this.name,
@@ -50,15 +37,7 @@ class Product {
     this.subType,
     required this.image,
     this.active = true,
-    this.leadTime,
   });
-
-  /// Délai de livraison si le produit est importé sur commande, sinon null.
-  String? get importLeadTime {
-    if (category != ImportOnDemand.category) return null;
-    final t = leadTime?.trim() ?? '';
-    return t.isNotEmpty ? t : ImportOnDemand.defaultLeadTime;
-  }
 
   /// URL complète de l'image (le serveur peut ne stocker qu'un nom de fichier).
   String? get imageUrl => ApiConfig.resolveProductImage(image);
@@ -100,7 +79,6 @@ class Product {
       subType: json['subType']?.toString(),
       image: json['image']?.toString() ?? '',
       active: json['active'] != false,
-      leadTime: json['leadTime']?.toString(),
     );
   }
 }
