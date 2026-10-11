@@ -1,0 +1,303 @@
+[
+  {
+    "id": "owendo",
+    "name": "Prix Import Owendo",
+    "shortName": "Owendo",
+    "orderPrefix": "PIO",
+    "port": 3000,
+    "contact": {
+      "address": "Route Nationale 1, Owendo, Libreville, Gabon",
+      "phone": "+241 07 41 32 215",
+      "email": "contact@priximport-owendo.ga",
+      "whatsapp": "24107413215"
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "07h00 – 19h30"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche & jours fériés",
+        "value": "Fermé"
+      }
+    ],
+    "features": null,
+    "surfaceM2": null,
+    "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbx3zDkqwLfWJDJYX52TkVW8f8exsRfPDC8qSh-B_9DR1CzTO1p0Ih9p1Gu1HuhxeRL5/exec"
+  },
+  {
+    "id": "centre-ville",
+    "name": "Prix Import Camp de Police – Centre Ville",
+    "shortName": "Centre Ville",
+    "orderPrefix": "PI-CV",
+    "port": 3001,
+    "contact": {
+      "address": null,
+      "phone": "011 72 19 93",
+      "email": "pi.cv@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-jeu",
+        "label": "Lundi — Jeudi",
+        "value": "08h00 – 19h30"
+      },
+      {
+        "id": "ven-sam",
+        "label": "Vendredi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": null
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie"
+    ],
+    "surfaceM2": 2000,
+    "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycby8LN8jYHPwKmKAJ8QXik4Bjit8PK_3NKUJEdfXvzQNJre0TqDsdjpNia5M6lDqD1sU/exec"
+  },
+  {
+    "id": "golf",
+    "name": "Prix Import Golf – Lalala",
+    "shortName": "Golf",
+    "orderPrefix": "PI-GOLF",
+    "port": 3002,
+    "contact": {
+      "address": null,
+      "phone": "066 00 06 60",
+      "email": "pi.golf@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "09h00 – 13h00"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie",
+      "Sandwicherie",
+      "Pizzeria"
+    ],
+    "surfaceM2": 1200,
+    "googleSheetWebhookUrl": ""
+  },
+  {
+    "id": "sni",
+    "name": "Prix Import SNI",
+    "shortName": "SNI",
+    "orderPrefix": "PI-SNI",
+    "port": 3003,
+    "contact": {
+      "address": null,
+      "phone": "011 70 58 34",
+      "email": "pi.sni@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "08h00 – 15h00"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie",
+      "Sandwicherie"
+    ],
+    "surfaceM2": 900,
+    "googleSheetWebhookUrl": ""
+  },
+  {
+    "id": "bikele",
+    "name": "Prix Import Bikélé",
+    "shortName": "Bikélé",
+    "orderPrefix": "PI-BIK",
+    "port": 3004,
+    "contact": {
+      "address": null,
+      "phone": "077 16 06 06",
+      "email": "pi.bikele@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "09h00 – 16h00"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Fromagerie",
+      "Sandwicherie"
+    ],
+    "surfaceM2": 1500,
+    "googleSheetWebhookUrl": ""
+  },
+  {
+    "id": "okala",
+    "name": "Prix Import Okala",
+    "shortName": "Okala",
+    "orderPrefix": "PI-OKA",
+    "port": 3005,
+    "contact": {
+      "address": null,
+      "phone": "062 00 60 06",
+      "email": "pi.okala@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h30 – 19h30"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "09h00 – 19h00"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie"
+    ],
+    "surfaceM2": 800,
+    "googleSheetWebhookUrl": ""
+  },
+  {
+    "id": "bas-de-guegue",
+    "name": "Prix Import Bas de Guégué",
+    "shortName": "Bas de Guégué",
+    "orderPrefix": "PI-BGG",
+    "port": 3006,
+    "contact": {
+      "address": null,
+      "phone": "077 76 05 02",
+      "email": "pi.bgg@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "09h00 – 19h00"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie"
+    ],
+    "surfaceM2": 700,
+    "googleSheetWebhookUrl": ""
+  },
+  {
+    "id": "nzeng-ayong",
+    "name": "Prix Import Nzeng Ayong",
+    "shortName": "Nzeng Ayong",
+    "orderPrefix": "PI-NZY",
+    "port": 3007,
+    "contact": {
+      "address": null,
+      "phone": "074 55 54 42",
+      "email": "pi.nzy@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "09h00 – 13h30"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie"
+    ],
+    "surfaceM2": 900,
+    "googleSheetWebhookUrl": ""
+  },
+  {
+    "id": "damas",
+    "name": "Prix Import Damas",
+    "shortName": "Damas",
+    "orderPrefix": "PI-DAM",
+    "port": 3008,
+    "contact": {
+      "address": null,
+      "phone": "062 34 00 00",
+      "email": "pi.damas@priximport.com",
+      "whatsapp": null
+    },
+    "hours": [
+      {
+        "id": "lun-sam",
+        "label": "Lundi — Samedi",
+        "value": "08h00 – 20h00"
+      },
+      {
+        "id": "dim",
+        "label": "Dimanche",
+        "value": "09h00 – 13h00"
+      }
+    ],
+    "features": [
+      "Dépôt",
+      "Boucherie",
+      "Cave",
+      "Fromagerie",
+      "Sandwicherie"
+    ],
+    "surfaceM2": 1100,
+    "googleSheetWebhookUrl": ""
+  }
+]

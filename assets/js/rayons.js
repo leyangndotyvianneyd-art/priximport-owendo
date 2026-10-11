@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — rayons.js =====
+// ===== PRIX IMPORT — rayons.js =====
 // Liste des rayons mis en avant (onglet « Rayons » du site, page
 // pages/rayon.html, menu de l'administration). Chaque rayon regroupe les
 // produits d'une catégorie (champ "category" de data/products.json), que
@@ -70,6 +70,12 @@ window.PioRayons = [
     types: ['Nourriture', 'Friandises', 'Accessoires', 'Hygiène & soins']
   }
 ];
+
+// Magasin sans cave (voir les atouts dans data/stores.json) : pas de rayon
+// Cave à vin.
+if (window.STORE && window.STORE.hasCave === false) {
+  window.PioRayons = window.PioRayons.filter((r) => r.slug !== 'cave');
+}
 
 // Adresse de la page d'un rayon, depuis la racine du site.
 window.PioRayonHref = function (r) {

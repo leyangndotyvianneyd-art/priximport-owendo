@@ -19,6 +19,7 @@ import '../screens/services_screen.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
+import '../config/store_info.dart';
 
 /// Carrousel en haut de l'accueil — même contenu que le carrousel du site
 /// (assets/js/hero-slider.js) : bienvenue, diapos créées dans l'admin
@@ -206,7 +207,7 @@ class _HomeSliderState extends State<HomeSlider> {
       theme: 'dark',
       eyebrow: 'Services',
       title: 'Livré chez vous, payé en Mobile Money',
-      text: 'Livraison sur Owendo et Libreville, Airtel Money / Moov Money, '
+      text: 'Livraison dans tout Libreville, Airtel Money / Moov Money, '
           'ou retrait en magasin.',
       ctaLabel: 'Voir les services',
       ctaHref: 'pages/services.html',
@@ -230,7 +231,7 @@ class _HomeSliderState extends State<HomeSlider> {
       _ when page.contains('rayon') && rayon != null => RayonScreen(rayon: rayon),
       _ when page.contains('catalogue') => const CatalogueScreen(),
       _ when page.contains('fraicheur') => const FraicheurScreen(),
-      _ when page.contains('cave') => const CaveScreen(),
+      _ when page.contains('cave') && StoreConfig.current.hasCave => const CaveScreen(),
       _ when page.contains('nouveautes') => const NouveautesScreen(),
       _ when page.contains('services') => const ServicesScreen(),
       _ when page.contains('localisation') => const LocalisationScreen(),
@@ -355,11 +356,11 @@ class _Slide {
         background: url,
       );
 
-  factory _Slide.welcome() => const _Slide(
+  factory _Slide.welcome() => _Slide(
         key: 'welcome',
         theme: 'green',
         title: 'Vos courses,\nau meilleur prix.',
-        text: 'Le supermarché de référence à Owendo : épicerie, produits '
+        text: 'Le supermarché de référence à ${StoreConfig.current.shortName} : épicerie, produits '
             'frais et locaux, à retirer en magasin ou livrés chez vous.',
         ctaLabel: 'Voir le catalogue',
         ctaHref: 'pages/catalogue.html',

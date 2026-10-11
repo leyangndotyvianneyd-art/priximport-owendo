@@ -15,6 +15,15 @@ if (keyPropertiesFile.exists()) {
     keyPropertiesFile.inputStream().use { keyProperties.load(it) }
 }
 
+// Les 9 magasins Prix Import (data/stores.json, à la racine du site) : une
+// appli par magasin, avec son propre nom et son propre identifiant, pour
+// qu'elles puissent être installées côte à côte et publiées séparément.
+//   flutter run --flavor golf
+//   flutter build apk --release --flavor golf --dart-define=API_URL=https://...
+@Suppress("UNCHECKED_CAST")
+val stores = groovy.json.JsonSlurper()
+    .parse(rootProject.file("../../data/stores.json")) as List<Map<String, Any?>>
+
 android {
     namespace = "com.priximportowendo.priximport_owendo_mobile"
     compileSdk = flutter.compileSdkVersion
@@ -34,6 +43,23 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    flavorDimensions += "store"
+    productFlavors {
+        for (store in stores) {
+            val id = store["id"] as String
+            create(id) {
+                dimension = "store"
+                // Owendo garde l'identifiant de l'appli déjà installée.
+                applicationId = if (id == "owendo") {
+                    "com.priximportowendo.priximport_owendo_mobile"
+                } else {
+                    "ga.priximport." + id.replace("-", "")
+                }
+                manifestPlaceholders["appName"] = store["name"] as String
+            }
+        }
     }
 
     signingConfigs {

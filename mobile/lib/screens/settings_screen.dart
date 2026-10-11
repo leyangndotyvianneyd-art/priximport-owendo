@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../config/store_info.dart';
 
 /// Écran Réglages : permet de changer l'adresse du serveur (server.js)
 /// sans recompiler l'appli — utile car l'IP locale du PC change souvent.
@@ -101,11 +102,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               ActionChip(
                 label: const Text('Émulateur Android'),
-                onPressed: () => _applyPreset('http://10.0.2.2:3000'),
+                onPressed: () => _applyPreset('http://10.0.2.2:${StoreConfig.current.port}'),
               ),
               ActionChip(
                 label: const Text('Simulateur iOS'),
-                onPressed: () => _applyPreset('http://localhost:3000'),
+                onPressed: () => _applyPreset('http://localhost:${StoreConfig.current.port}'),
               ),
               ActionChip(
                 label: const Text('Valeur par défaut'),

@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — categories.js =====
+// ===== PRIX IMPORT — categories.js =====
 // Charge la liste des catégories depuis data/products.json pour alimenter
 // le menu déroulant "Toutes les catégories" du header (présent sur toutes
 // les pages) et la sidebar catégories de la page d'accueil, si présente.

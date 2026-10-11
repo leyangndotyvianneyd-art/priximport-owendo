@@ -2,7 +2,7 @@
     <!-- Nécessaire en version release pour joindre le serveur (catalogue, commandes). -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="Prix Import Owendo"
+        android:label="${appName}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">

@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — nav-preview.js =====
+// ===== PRIX IMPORT — nav-preview.js =====
 // Aperçu au survol des onglets du menu principal (.nav-links) : quand on
 // passe la souris (ou le clavier) sur "Catalogue", "Nouveautés", etc., un
 // panneau s'ouvre sous la barre et montre ce qu'on va trouver dans l'onglet.
@@ -234,7 +234,7 @@
       ).join('');
       return introHTML({
         eyebrow: 'Localisation & horaires',
-        title: 'Venez nous voir à Owendo',
+        title: window.STORE ? `Venez nous voir : ${window.STORE.name}` : 'Venez nous voir',
         text: c.mapCaption || contact.address || '',
         href: base + 'pages/localisation.html',
         cta: 'Voir le plan'

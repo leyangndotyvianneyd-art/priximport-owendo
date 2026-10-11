@@ -1,0 +1,113 @@
+{
+  "topbarMessage": "Livraison dans tout Libreville",
+  "topbarHighlight": "Paiement Mobile Money accepté",
+  "footerTagline": "Supermarché de produits importés et de fraîcheur locale — Prix Import Bikélé, Libreville. Prix bas, gros volumes, paiement Mobile Money.",
+  "contact": {
+    "address": "Bikélé, Libreville, Gabon",
+    "phone": "077 16 06 06",
+    "email": "pi.bikele@priximport.com",
+    "whatsapp": ""
+  },
+  "mapCaption": "Prix Import Bikélé — Libreville",
+  "hours": [
+    {
+      "id": "lun-sam",
+      "label": "Lundi — Samedi",
+      "value": "08h00 – 20h00"
+    },
+    {
+      "id": "dim",
+      "label": "Dimanche",
+      "value": "09h00 – 16h00"
+    }
+  ],
+  "freshNote": "autant que possible, le rayon frais privilégie les producteurs gabonais. Le rayon import complète l'offre pour le stock, la conservation et les gros volumes.",
+  "cards": {
+    "home": [
+      {
+        "id": "home-catalogue",
+        "icon": "bag",
+        "title": "Catalogue promotionnel",
+        "text": "Épicerie, boissons, hygiène — filtrez par catégorie et profitez des prix en promotion.",
+        "href": "pages/catalogue.html"
+      },
+      {
+        "id": "home-fraicheur",
+        "icon": "leaf",
+        "title": "Fraîcheur & local",
+        "text": "Plantain, manioc, poisson du port et légumes de saison, livrés chaque matin.",
+        "href": "pages/fraicheur.html"
+      },
+      {
+        "id": "home-nouveautes",
+        "icon": "clock",
+        "title": "Nouveautés",
+        "text": "Les derniers arrivages en photo et en vidéo, publiés régulièrement.",
+        "href": "pages/nouveautes.html"
+      },
+      {
+        "id": "home-services",
+        "icon": "card",
+        "title": "Mobile Money & livraison",
+        "text": "Paiement Airtel Money / Moov Money, livraison dans tout Libreville.",
+        "href": "pages/services.html"
+      }
+    ],
+    "fraicheur": [
+      {
+        "id": "fresh-plantain",
+        "icon": "plantain",
+        "title": "Plantain & manioc",
+        "text": "Récoltés dans les environs, livrés en magasin chaque jour.",
+        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local"
+      },
+      {
+        "id": "fresh-fish",
+        "icon": "fish",
+        "title": "Poisson du port",
+        "text": "Arrivage frais en lien avec les pêcheurs de la région.",
+        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local&q=poisson"
+      },
+      {
+        "id": "fresh-veggie",
+        "icon": "veggie",
+        "title": "Légumes de saison",
+        "text": "Gombo, feuilles de manioc, piments — au rythme des récoltes.",
+        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local&q=l%C3%A9gume"
+      },
+      {
+        "id": "fresh-morning",
+        "icon": "morning",
+        "title": "Livré chaque matin",
+        "text": "Rotation quotidienne pour garantir la fraîcheur en rayon.",
+        "href": "pages/catalogue.html?category=Fra%C3%AEcheur%20%26%20Local"
+      }
+    ],
+    "services": [
+      {
+        "id": "svc-livraison",
+        "icon": "truck",
+        "title": "Livraison à domicile",
+        "text": "Livraison dans tout Libreville pour toute commande passée en magasin ou par téléphone."
+      },
+      {
+        "id": "svc-mobilemoney",
+        "icon": "card",
+        "title": "Mobile Money",
+        "text": "Paiement accepté via Airtel Money et Moov Money, en caisse comme à la livraison."
+      },
+      {
+        "id": "svc-gros",
+        "icon": "box",
+        "title": "Achats en gros",
+        "text": "Tarifs dégressifs pour les commerçants et revendeurs sur les cartons et sacs complets."
+      },
+      {
+        "id": "svc-retrait",
+        "icon": "check-shield",
+        "title": "Retrait en magasin",
+        "text": "Réservez vos produits en promotion, ils vous attendent en caisse prioritaire."
+      }
+    ]
+  }
+}

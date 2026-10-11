@@ -1,0 +1,174 @@
+[
+  {
+    "id": "riz-basmati-25kg",
+    "name": "Riz Basmati (sac 25kg)",
+    "unit": "Sac de 25kg",
+    "price": 18000,
+    "promo": false,
+    "category": "Épicerie",
+    "image": "https://i0.wp.com/directinfosgabon.com/wp-content/uploads/2019/03/riz-jasmin.jpg?resize=640%2C380&ssl=1",
+    "active": true
+  },
+  {
+    "id": "riz-parfume-5kg",
+    "name": "Riz parfumé",
+    "unit": "Sac de 5kg",
+    "price": 6500,
+    "category": "Épicerie",
+    "image": "https://images.coinafrique.com/5370914_uploaded_image1_1749723957.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "huile-vegetale-5l",
+    "name": "Huile végétale",
+    "unit": "Bidon 5L",
+    "price": 1200,
+    "category": "Épicerie",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYGjtzJY_NzVlri2AGIyB-tKHLKHUIwaK1uEHKwQZ_UA&s=10",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "farine-ble-1kg",
+    "name": "Farine",
+    "unit": "Paquet 1kg",
+    "price": 1000,
+    "promo": false,
+    "category": "Épicerie",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpKG8NWEOPgIJN2kKWTNAW3hPwPNxpgPtPoyafNuPdYA&s=10",
+    "active": true
+  },
+  {
+    "id": "lait-poudre-900g",
+    "name": "Lait en poudre",
+    "unit": "Boîte 900g",
+    "price": 4200,
+    "category": "Épicerie",
+    "image": "https://s.rfi.fr/media/display/4d37dbe0-127f-11ea-a592-005056a99247/w:1280/p:3x4/lait-en-poudre_1_0.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "eau-minerale-pack6",
+    "name": "Eau minérale",
+    "unit": "Pack de 6 x 1.5L",
+    "price": 1800,
+    "category": "Boissons",
+    "image": "https://c8.alamy.com/compfr/brhk64/l-eau-minerale-en-bouteille-pour-la-vente-dans-un-supermarche-empiles-sur-des-etageres-uk-brhk64.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "jus-fruits-1l",
+    "name": "Jus de fruits",
+    "unit": "Bouteille 1L",
+    "price": 1500,
+    "category": "Boissons",
+    "image": "https://thumbs.dreamstime.com/b/jus-de-fruit-assortis-dans-le-supermarch%C3%A9-gastronome-78042483.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "plantain-regime",
+    "name": "Banane douce",
+    "unit": "1kg",
+    "price": 1200,
+    "category": "Fraîcheur & Local",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnnWWTzD9yRZ_VV744W_H18D0ulQK78O4bjFwPsBa-0_48xIjcnrLN2AE&s=10",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "poisson-frais-kg",
+    "name": "Poissons",
+    "unit": "Kg",
+    "price": 2500,
+    "category": "Fraîcheur & Local",
+    "image": "https://c8.alamy.com/compfr/2y6ggme/italie-25-septembre-2024-poisson-congele-emballe-et-expose-dans-de-grandes-vitrines-refrigerees-pour-la-vente-dans-le-magasin-de-rabais-de-supermarche-italien-2y6ggme.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "legumes-panier",
+    "name": "Légumes locaux",
+    "unit": "Panier",
+    "price": 2000,
+    "category": "Fraîcheur & Local",
+    "image": "https://www.shutterstock.com/image-photo/wonosobo-central-java-indonesia-december-260nw-2648673313.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "savon-lessive",
+    "name": "Savon de lessive",
+    "unit": "Pain",
+    "price": 600,
+    "category": "Hygiène & Entretien",
+    "image": "https://c8.alamy.com/compfr/2y6ggme/italie-25-septembre-2024-poisson-congele-emballe-et-expose-dans-de-grandes-vitrines-refrigerees-pour-la-vente-dans-le-magasin-de-rabais-de-supermarche-italien-2y6ggme.jpg",
+    "active": true,
+    "promo": false
+  },
+  {
+    "id": "couches-bebe-paquet",
+    "name": "Couches bébé",
+    "unit": "Paquet",
+    "price": 5500,
+    "category": "Bébé",
+    "image": "https://thumbs.dreamstime.com/b/bas-c%C3%B4t%C3%A9-de-produits-b%C3%A9b%C3%A9-d-une-%C3%A9picerie-vero-beach-fl-usa-le-avec-des-couches-culottes-shampooing-lavage-lotion-et-154631939.jpg",
+    "active": true,
+    "promo": false,
+    "oldPrice": 4300
+  },
+  {
+    "id": "fromage",
+    "name": "Fromage",
+    "unit": "1kg",
+    "price": 1500,
+    "oldPrice": 1200,
+    "promo": false,
+    "category": "Épicerie",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlU1WrKr82qBHZWX4jv6FFv1YZLgN2QDkXiYG08FejutQBdd3KcoK3qrA&s=10",
+    "active": true
+  },
+  {
+    "id": "produit-menager",
+    "name": "soin corporels",
+    "unit": "1L",
+    "price": 2850,
+    "promo": false,
+    "category": "Hygiène & Entretien",
+    "image": "https://i.f1g.fr/media/eidos/704x396_cropupscale/2023/03/24/XVMde074b4c-ca5f-11ed-892f-3dc56cfb0010.jpg",
+    "active": true
+  },
+  {
+    "id": "balais-nettoyant",
+    "name": "Balais nettoyant",
+    "unit": "1",
+    "price": 750,
+    "promo": false,
+    "category": "Hygiène & Entretien",
+    "image": "https://thumbs.dreamstime.com/b/t%C3%AAtes-de-balai-color%C3%A9es-dans-la-boutique-grecque-en-plastique-color%C3%A9-nylon-vendu-s%C3%A9par%C3%A9ment-des-poign%C3%A9es-%C3%A0-vendre-gr%C3%A8ce-253102399.jpg",
+    "active": true
+  },
+  {
+    "id": "produits-pour-bebes",
+    "name": "Produits pour bébés",
+    "unit": "Sac de 25kg",
+    "price": 7000,
+    "promo": false,
+    "category": "Bébé",
+    "image": "https://c8.alamy.com/compfr/2tdcmym/allee-des-produits-pour-bebes-au-supermarche-de-san-diego-californie-2tdcmym.jpg",
+    "active": true
+  },
+  {
+    "id": "poissons",
+    "name": "Poissons",
+    "unit": "1kg",
+    "price": 1200,
+    "promo": false,
+    "category": "Fraîcheur & Local",
+    "image": "https://cdn.metro-online.com/-/media/Project/MCW/FR_Metro/Images/services-inspirations/metro/univers-produits/maree/OpenGraph/maree.jpg?rev=f0570d86879744ff8aed1a9ab6fcd066",
+    "active": true
+  }
+]

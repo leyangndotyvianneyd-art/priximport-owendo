@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — cart.js =====
+// ===== PRIX IMPORT — cart.js =====
 // Panier client, persisté dans localStorage. Chargé sur toutes les pages,
 // AVANT main.js, pour que window.Cart soit disponible partout.
 

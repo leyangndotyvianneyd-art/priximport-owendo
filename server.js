@@ -5,29 +5,27 @@ const crypto = require('crypto');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
+const Stores = require('./store');
+
+// Magasin servi par ce serveur : `node server.js golf`, ou STORE_ID=golf
+// chez un hébergeur (voir store.js et data/stores.json). Par défaut : Owendo.
+const STORE = Stores.resolveStoreOrExit(Stores.storeIdFromArgs());
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || STORE.port || 3000;
 const IS_PROD = process.env.NODE_ENV === 'production';
 
 // Dossier où sont rangées les données modifiables (data/*.json) et les
-// fichiers envoyés depuis l'admin (assets/videos, assets/img/...). Par
-// défaut : le dossier du projet. Chez un hébergeur, pointe STORAGE_DIR vers
-// un disque persistant, sinon tout ce qui est ajouté depuis l'admin (et les
-// commandes) serait perdu à chaque redémarrage/redéploiement.
-const STORAGE_DIR = process.env.STORAGE_DIR ? path.resolve(process.env.STORAGE_DIR) : __dirname;
-const DATA_DIR = path.join(STORAGE_DIR, 'data');
+// fichiers envoyés depuis l'admin (assets/videos, assets/img/...) du
+// magasin : le dossier du projet pour Owendo, stores/<id>/ pour les autres.
+// Chez un hébergeur, pointe STORAGE_DIR vers un disque persistant, sinon
+// tout ce qui est ajouté depuis l'admin (et les commandes) serait perdu à
+// chaque redémarrage/redéploiement.
+const STORAGE_DIR = Stores.storageDirFor(STORE);
 
-// Premier démarrage sur un disque vide : on y recopie les données livrées
-// avec le projet (catalogue, publications, contenu) pour ne pas partir de zéro.
-if (STORAGE_DIR !== __dirname) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  ['products.json', 'posts.json', 'content.json'].forEach((f) => {
-    const target = path.join(DATA_DIR, f);
-    const seed = path.join(__dirname, 'data', f);
-    if (!fs.existsSync(target) && fs.existsSync(seed)) fs.copyFileSync(seed, target);
-  });
-}
+// Premier démarrage sur un dossier vide : on y prépare les données du
+// magasin (catalogue, contenu, coordonnées) pour ne pas partir de zéro.
+const DATA_DIR = Stores.ensureStoreData(STORE, STORAGE_DIR);
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 if (IS_PROD && !SESSION_SECRET) {
@@ -52,6 +50,9 @@ app.use(express.json({ limit: '200kb' }));
 // Session utilisée par la page d'administration (pages/admin.html) pour
 // savoir qui est connecté. En production, SESSION_SECRET est obligatoire.
 app.use(session({
+  // Un nom de cookie par magasin : en local, les 9 serveurs tournent sur la
+  // même adresse (ports différents) et partageraient sinon la même session.
+  name: `pi.${STORE.id}.sid`,
   // Sans SESSION_SECRET : clé aléatoire à chaque démarrage (il faut juste se
   // reconnecter à l'admin après un redémarrage) — jamais une clé connue.
   secret: SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
@@ -98,6 +99,62 @@ app.use((req, res, next) => {
   res.status(404).send('Page introuvable.');
 });
 
+// ---- Pages HTML personnalisées pour le magasin ----
+// Les pages contiennent des repères ({{NAME}}, {{SHORT}}, {{PHONE}}...)
+// remplacés ici par les infos du magasin servi, et reçoivent window.STORE
+// (nom, atouts...) pour les scripts du site. Coordonnées : celles de
+// data/content.json, modifiables depuis l'administration.
+
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function storeTokens(content) {
+  const contact = (content && content.contact) || {};
+  return {
+    NAME: STORE.name,
+    NAME_UPPER: STORE.name.toUpperCase(),
+    SHORT: STORE.shortName,
+    ADDRESS: contact.address || '',
+    PHONE: contact.phone || '',
+    EMAIL: contact.email || '',
+    WHATSAPP: contact.whatsapp || '',
+    MAP_CAPTION: (content && content.mapCaption) || contact.address || ''
+  };
+}
+
+function storeHead(content) {
+  // Coordonnées à jour (modifiables depuis l'admin) plutôt que celles de départ.
+  const info = Stores.publicStore(STORE);
+  if (content && content.contact) info.contact = { ...info.contact, ...content.contact };
+  const json = JSON.stringify(info).replace(/</g, '\\u003c');
+  // Magasin sans cave : on masque tous les liens vers la page Cave à vin.
+  const noCave = Stores.hasFeature(STORE, 'Cave') ? '' :
+    '<style>li:has(> a[href*="cave.html"]),a.quick-link[href*="cave.html"]{display:none!important}</style>';
+  return `<script>window.STORE=${json};</script>${noCave}`;
+}
+
+app.get(/^\/((pages\/)?[A-Za-z0-9_-]+\.html)?$/, async (req, res, next) => {
+  const rel = req.path === '/' ? 'index.html' : req.path.slice(1);
+  if (rel === 'pages/cave.html' && !Stores.hasFeature(STORE, 'Cave')) return res.redirect('/pages/rayon.html');
+  let html;
+  try {
+    html = await fs.promises.readFile(path.join(__dirname, rel), 'utf8');
+  } catch (e) {
+    return next();
+  }
+  let content = null;
+  try { content = await readJsonFile(CONTENT_FILE); } catch (e) { /* valeurs vides */ }
+  const tokens = storeTokens(content);
+  html = html
+    .replace(/\{\{([A-Z_]+)\}\}/g, (m, key) => (key in tokens ? escapeHtml(tokens[key]) : m))
+    .replace(/<head>/i, (m) => m + storeHead(content));
+  res.set('Cache-Control', 'no-cache');
+  res.type('html').send(html);
+});
+
 // Fichiers envoyés depuis l'admin (s'ils sont rangés hors du projet), puis le site.
 if (STORAGE_DIR !== __dirname) {
   app.use('/assets', express.static(path.join(STORAGE_DIR, 'assets')));
@@ -111,10 +168,11 @@ const ADMINS_FILE = path.join(DATA_DIR, 'admins.json');
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 
 // URL du "Web App" Google Apps Script qui reçoit chaque commande et l'ajoute
-// à une feuille Google Sheets pour l'administrateur. Laisse la valeur vide
-// ("") pour désactiver cet envoi. Voir README.md ("Suivi des commandes dans
-// Google Sheets") pour la procédure de création de ce lien, étape par étape.
-const GOOGLE_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx3zDkqwLfWJDJYX52TkVW8f8exsRfPDC8qSh-B_9DR1CzTO1p0Ih9p1Gu1HuhxeRL5/exec';
+// à une feuille Google Sheets pour l'administrateur du magasin : champ
+// "googleSheetWebhookUrl" du magasin dans data/stores.json (ou variable
+// d'environnement GOOGLE_SHEET_WEBHOOK_URL). Vide = envoi désactivé. Voir
+// README.md ("Suivi des commandes dans Google Sheets") pour créer ce lien.
+const GOOGLE_SHEET_WEBHOOK_URL = process.env.GOOGLE_SHEET_WEBHOOK_URL || STORE.googleSheetWebhookUrl || '';
 
 function sendOrderToGoogleSheet(order) {
   if (!GOOGLE_SHEET_WEBHOOK_URL) return;
@@ -193,6 +251,12 @@ app.get('/api/posts', (req, res) => {
 // cartes des pages Accueil/Fraîcheur/Services...) — utilisé par
 // assets/js/site-content.js sur toutes les pages publiques, pour que tout
 // changement fait depuis l'administration apparaisse partout à la fois.
+// API : magasin servi par ce serveur (nom, coordonnées de départ, atouts...)
+// — utilisé par l'appli mobile pour vérifier qu'elle parle au bon magasin.
+app.get('/api/store', (req, res) => {
+  res.json(Stores.publicStore(STORE));
+});
+
 app.get('/api/content', (req, res) => {
   fs.readFile(CONTENT_FILE, 'utf8', (err, data) => {
     if (err) {
@@ -248,10 +312,10 @@ app.post('/api/commande', async (req, res) => {
     items.push({ id: product.id, name: product.name, price: Number(product.price) || 0, qty });
   }
 
-  const reference = 'PIO-' + Date.now().toString(36).toUpperCase();
+  const reference = `${STORE.orderPrefix}-` + Date.now().toString(36).toUpperCase();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
 
-  const order = { reference, date: new Date().toISOString(), customer, items, total };
+  const order = { reference, store: STORE.name, date: new Date().toISOString(), customer, items, total };
 
   fs.readFile(ORDERS_FILE, 'utf8', (err, data) => {
     let orders = [];
@@ -889,5 +953,6 @@ app.delete('/api/admin/slider/slides/:id', requireAdmin, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Serveur PRIX IMPORT OWENDO opérationnel sur http://localhost:${PORT}`);
+  console.log(`Serveur ${STORE.name.toUpperCase()} opérationnel sur http://localhost:${PORT}`);
+  if (STORAGE_DIR !== __dirname) console.log(`    Données du magasin : ${STORAGE_DIR}`);
 });

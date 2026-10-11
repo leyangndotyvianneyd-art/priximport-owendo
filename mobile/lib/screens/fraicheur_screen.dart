@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/cart_badge_icon.dart';
 import '../widgets/content_builder.dart';
+import '../config/store_info.dart';
 
 /// Page Fraîcheur & local — cartes et note gérées depuis l'admin
 /// (onglet "Contenu du site"), comme pages/fraicheur.html.
@@ -24,7 +25,7 @@ class FraicheurScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           children: [
             Text(
-              'Le meilleur du frais, made in Owendo',
+              'Le meilleur du frais, made in ${StoreConfig.current.id == 'owendo' ? 'Owendo' : 'Gabon'}',
               style: Theme.of(context).textTheme.displayMedium,
             ),
             const SizedBox(height: 20),

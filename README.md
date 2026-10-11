@@ -10,6 +10,61 @@ Le contenu du catalogue se gère en éditant un seul fichier —
 Les publications de la page Nouveautés se gèrent de la même façon dans
 `assets/js/posts-data.js`.
 
+## Les 9 magasins Prix Import (un seul code)
+
+Le même code sert les 9 supermarchés : Owendo, Centre Ville (Camp de
+Police), Golf – Lalala, SNI, Bikélé, Okala, Bas de Guégué, Nzeng Ayong et
+Damas. Chaque magasin a **son propre site, sa propre appli, son catalogue,
+ses commandes et sa page d'administration**. Une amélioration du code
+profite aux 9 d'un coup.
+
+**La fiche de chaque magasin** (nom, téléphone, WhatsApp, email, horaires,
+atouts, superficie, préfixe des commandes, port local, lien Google Sheets)
+est dans `data/stores.json`. Après une modification de ce fichier, lance
+`npm run sync-mobile` pour la reporter dans l'appli.
+
+**Lancer un magasin** (identifiants : `owendo`, `centre-ville`, `golf`,
+`sni`, `bikele`, `okala`, `bas-de-guegue`, `nzeng-ayong`, `damas`) :
+```bash
+npm start                 # Prix Import Owendo, http://localhost:3000
+npm start -- golf         # Prix Import Golf, sur son port (3002)
+npm run start-all         # les 9 en même temps, ports 3000 à 3008
+```
+Chez un hébergeur : un service par magasin, avec la variable
+d'environnement `STORE_ID` (ex. `STORE_ID=golf`) et un `STORAGE_DIR`
+propre à chaque magasin.
+
+**Données de chaque magasin** : Owendo garde `data/` et `assets/` comme
+avant. Les autres sont rangés dans `stores/<id>/` (créé au premier
+démarrage, à partir d'une copie du catalogue d'Owendo, sans la cave pour
+un magasin qui n'en a pas, sans les publications Nouveautés d'Owendo, et
+avec ses propres coordonnées et horaires).
+
+**Comptes administrateur** :
+```bash
+npm run create-admin -- golf      # le gérant de Golf (ne voit que Golf)
+npm run create-admin -- --all     # toi : le même compte sur les 9 magasins
+```
+
+**Atouts** : la page Localisation (site et appli) affiche les atouts et la
+superficie du magasin. Un magasin sans « Cave » n'affiche ni la page ni le
+rayon Cave à vin.
+
+**Les 9 applis Android** (une appli par magasin, nom et identifiant
+propres, installables côte à côte) :
+```bash
+cd mobile
+flutter run --flavor golf
+flutter build apk --release --flavor golf --dart-define=API_URL=https://site-de-golf
+```
+Le `--flavor` est désormais obligatoire sur Android (`--flavor owendo` pour
+Owendo, qui garde l'identifiant de l'appli déjà installée). Sur les autres
+plateformes : `--dart-define=STORE_ID=golf`.
+
+⚠️ Les pages HTML contiennent des repères (`{{NAME}}`, `{{PHONE}}`...)
+remplis par le serveur : ouvre toujours le site via `npm start`, pas avec
+Live Server (option A ci-dessous), sinon ces repères s'affichent tels quels.
+
 ## Lancer le site en local
 
 Deux façons de le lancer, selon ce que tu veux tester :
@@ -152,46 +207,26 @@ l'administrateur du magasin suive les commandes sans ouvrir de fichier
 technique. Aucune carte de crédit ni compte Google Cloud payant n'est
 nécessaire : on utilise un petit script Google Apps Script gratuit.
 
-**Étape 1 — Créer la feuille**
-1. Va sur [sheets.google.com](https://sheets.google.com) et crée une feuille
-   vide, par exemple nommée "Commandes Prix Import Owendo".
-2. Sur la première ligne, ajoute ces en-têtes de colonnes :
-   `Date | Référence | Client | Téléphone | Mode | Adresse | Articles | Total (FCFA)`
-
-**Étape 2 — Ajouter le script qui reçoit les commandes**
-1. Dans la feuille, va dans le menu **Extensions → Apps Script**.
-2. Supprime le code d'exemple et colle celui-ci :
-
-```javascript
-function doPost(e) {
-  // Onglet "Commandes" s'il existe, sinon le premier onglet.
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Commandes') || ss.getSheets()[0];
-  var data = JSON.parse(e.postData.contents);
-
-  var itemsText = data.items.map(function (i) {
-    return i.qty + 'x ' + i.name;
-  }).join(', ');
-
-  sheet.appendRow([
-    new Date(data.date),
-    data.reference,
-    data.customer.name,
-    data.customer.phone,
-    data.customer.mode,
-    data.customer.address || '',
-    itemsText,
-    data.total
-  ]);
-
-  return ContentService
-    .createTextOutput(JSON.stringify({ ok: true }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+**Chaque magasin a sa propre feuille.** Pour voir quels magasins sont déjà
+reliés :
+```bash
+npm run set-sheet
 ```
 
-3. Clique sur l'icône de disquette pour enregistrer (donne-lui un nom, ex.
-   "Commandes Webhook").
+Pour chaque magasin qui affiche `PAS DE FEUILLE` (environ 3 minutes) :
+
+**Étape 1 — Créer la feuille**
+Va sur [sheets.google.com](https://sheets.google.com) et crée une feuille
+vide nommée par exemple "Commandes Prix Import Golf". Pas besoin d'écrire
+les en-têtes : le script crée l'onglet `Commandes` et ses colonnes tout seul.
+
+**Étape 2 — Coller le script**
+1. Dans la feuille, va dans le menu **Extensions → Apps Script**.
+2. Supprime le code d'exemple et colle tout le contenu du fichier
+   [`scripts/google-sheet-webhook.gs`](scripts/google-sheet-webhook.gs)
+   (le même pour tous les magasins, rien à modifier).
+3. Clique sur l'icône de disquette pour enregistrer (nom du projet, ex.
+   "Commandes Webhook Golf").
 
 **Étape 3 — Déployer en tant que Web App**
 1. Clique sur **Déployer → Nouveau déploiement**.
@@ -205,14 +240,21 @@ function doPost(e) {
    **Paramètres avancés** → **Accéder à [nom du projet] (non sécurisé)**.
 5. Copie l'URL fournie (elle se termine par `/exec`).
 
-**Étape 4 — Relier le site à cette feuille**
-Ouvre `server.js`, trouve la ligne :
-```javascript
-const GOOGLE_SHEET_WEBHOOK_URL = '';
+**Étape 4 — Relier le magasin à sa feuille**
+```bash
+npm run set-sheet -- golf https://script.google.com/macros/s/XXXX/exec --test
 ```
-et colle ton URL entre les guillemets. Sauvegarde, puis relance le serveur
-(`Ctrl+C` puis `npm start`). Chaque nouvelle commande apparaîtra
-automatiquement comme une nouvelle ligne dans la feuille Google Sheets.
+(remplace `golf` par l'identifiant du magasin et colle ton lien). Le lien est
+enregistré dans `data/stores.json` et `--test` envoie une commande test :
+vérifie qu'elle arrive dans l'onglet `Commandes`, puis supprime cette ligne.
+Relance ensuite le serveur du magasin (`Ctrl+C` puis `npm start -- golf`,
+ou `npm run start-all`).
+
+Pour partager la feuille avec le gérant du magasin : bouton **Partager** en
+haut à droite de la feuille, avec son adresse Gmail.
+
+Owendo est déjà relié à sa feuille, avec l'ancien script (sans la colonne
+`Magasin`) : il continue de fonctionner tel quel.
 
 Si Google Sheets est injoignable (réseau, panne...), la commande du client
 n'est jamais bloquée : elle reste de toute façon enregistrée dans

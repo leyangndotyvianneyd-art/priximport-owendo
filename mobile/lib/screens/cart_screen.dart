@@ -7,12 +7,12 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import 'main_shell.dart';
 import '../utils/formatters.dart';
+import '../config/store_info.dart';
 
-/// Numéro WhatsApp du magasin, utilisé pour la confirmation de commande
-/// (même numéro que assets/js/panier-page.js côté site web).
-/// Numéro WhatsApp de secours, si le contenu de l'admin n'a pas pu être
-/// chargé. Le vrai numéro vient de l'admin (onglet "Contenu du site").
-const String fallbackShopPhone = '24107413215';
+/// Numéro WhatsApp de secours du magasin (data/stores.json), si le contenu
+/// de l'admin n'a pas pu être chargé. Le vrai numéro vient de l'admin
+/// (onglet "Contenu du site").
+final String fallbackShopPhone = StoreConfig.current.whatsapp;
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -39,7 +39,7 @@ class _CartScreenState extends State<CartScreen> {
 
   String _generateOfflineReference() {
     final now = DateTime.now().millisecondsSinceEpoch;
-    return 'PIO-${now.toRadixString(36).toUpperCase()}';
+    return '${StoreConfig.current.orderPrefix}-${now.toRadixString(36).toUpperCase()}';
   }
 
   Future<void> _submit(CartProvider cart) async {
@@ -110,7 +110,11 @@ class _CartScreenState extends State<CartScreen> {
     } catch (_) {
       // Hors connexion : numéro de secours.
     }
-    final uri = Uri.parse('https://wa.me/$shopPhone?text=$text');
+    // Magasin sans WhatsApp renseigné : on l'appelle à la place.
+    final tel = StoreConfig.current.phone.replaceAll(RegExp(r'[^0-9+]'), '');
+    final uri = shopPhone.isNotEmpty
+        ? Uri.parse('https://wa.me/$shopPhone?text=$text')
+        : Uri(scheme: 'tel', path: tel);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

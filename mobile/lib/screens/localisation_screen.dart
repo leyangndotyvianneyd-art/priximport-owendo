@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/cart_badge_icon.dart';
 import '../widgets/content_builder.dart';
+import '../config/store_info.dart';
 
 /// Coordonnées et horaires du magasin — gérés depuis l'admin (onglet
 /// "Contenu du site"), comme pages/localisation.html.
@@ -13,7 +14,7 @@ class LocalisationScreen extends StatelessWidget {
   const LocalisationScreen({super.key});
 
   Future<void> _openMaps(String address) async {
-    final query = Uri.encodeComponent('Prix Import Owendo, $address');
+    final query = Uri.encodeComponent('${StoreConfig.current.name}, $address');
     final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
@@ -109,6 +110,40 @@ class LocalisationScreen extends StatelessWidget {
                   Text('Horaires', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 10),
                   for (final h in c.hours) _hoursRow(h.label, h.value),
+                ],
+              ),
+            ),
+          ),
+        ],
+        if (StoreConfig.current.features?.isNotEmpty ?? false) ...[
+          const SizedBox(height: 20),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nos atouts',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final f in StoreConfig.current.features!)
+                        Chip(
+                          label: Text(f),
+                          backgroundColor: AppColors.green,
+                          labelStyle: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                    ],
+                  ),
+                  if (StoreConfig.current.surfaceM2 != null) ...[
+                    const SizedBox(height: 10),
+                    Text('Surface de vente : ${StoreConfig.current.surfaceM2} m²',
+                        style: const TextStyle(color: AppColors.gray)),
+                  ],
                 ],
               ),
             ),

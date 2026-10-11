@@ -14,3 +14,8 @@ data/*.backup*.json
 mobile/android/key.properties
 *.jks
 *.keystore
+
+# Données privées des autres magasins (stores/<id>/data/)
+stores/*/data/orders.json
+stores/*/data/admins.json
+stores/*/data/*.backup*.json

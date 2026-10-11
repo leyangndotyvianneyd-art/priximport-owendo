@@ -2,12 +2,16 @@
 // page d'administration du site (pages/admin.html).
 //
 // Utilisation :
-//   npm run create-admin
+//   npm run create-admin                 (Prix Import Owendo)
+//   npm run create-admin -- golf         (un autre magasin, voir data/stores.json)
+//   npm run create-admin -- --all        (le même compte sur les 9 magasins :
+//                                         super-administrateur)
 //
 // Le script demande un email, un nom (optionnel) et un mot de passe, puis
-// enregistre le compte (mot de passe chiffré, jamais en clair) dans
-// data/admins.json. Relance ce script avec le même email pour changer le
-// mot de passe d'un compte existant.
+// enregistre le compte (mot de passe chiffré, jamais en clair) dans le
+// fichier admins.json du magasin (data/ pour Owendo, stores/<id>/data/ pour
+// les autres). Relance ce script avec le même email pour changer le mot de
+// passe d'un compte existant.
 //
 // Remarque : le mot de passe reste visible à l'écran pendant que tu le
 // tapes (pas d'étoiles) — assure-toi que personne ne regarde ton écran.
@@ -16,10 +20,15 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const bcrypt = require('bcryptjs');
+const Stores = require('../store');
+
+const ALL = process.argv.includes('--all');
+const targets = ALL ? Stores.STORES : [Stores.resolveStoreOrExit(Stores.storeIdFromArgs())];
 
 // Même emplacement que celui lu par server.js (STORAGE_DIR chez un hébergeur).
-const STORAGE_DIR = process.env.STORAGE_DIR ? path.resolve(process.env.STORAGE_DIR) : path.join(__dirname, '..');
-const ADMINS_FILE = path.join(STORAGE_DIR, 'data', 'admins.json');
+function adminsFileFor(store) {
+  return path.join(Stores.storageDirFor(store), 'data', 'admins.json');
+}
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 function ask(question) {
@@ -28,7 +37,9 @@ function ask(question) {
 
 (async () => {
   console.log('=== Création / mise à jour d\'un compte administrateur ===');
-  console.log('(Prix Import Owendo — page d\'administration du catalogue)\n');
+  console.log(ALL
+    ? `(les ${targets.length} magasins Prix Import — super-administrateur)\n`
+    : `(${targets[0].name} — page d'administration du catalogue)\n`);
 
   const emailRaw = await ask('Email : ');
   const email = emailRaw.trim().toLowerCase();
@@ -45,29 +56,34 @@ function ask(question) {
     process.exit(1);
   }
 
-  let admins = [];
-  if (fs.existsSync(ADMINS_FILE)) {
-    try {
-      admins = JSON.parse(fs.readFileSync(ADMINS_FILE, 'utf8') || '[]');
-    } catch (e) {
-      admins = [];
-    }
-  }
-
   const passwordHash = bcrypt.hashSync(password, 10);
-  const existingIndex = admins.findIndex((a) => a.email === email);
-  const id = existingIndex >= 0 ? admins[existingIndex].id : 'admin-' + Date.now().toString(36);
-  const record = { id, email, name: name || null, passwordHash };
+  console.log('');
 
-  if (existingIndex >= 0) {
-    admins[existingIndex] = record;
-    console.log(`\nMot de passe mis à jour pour ${email}.`);
-  } else {
-    admins.push(record);
-    console.log(`\nCompte administrateur créé pour ${email}.`);
+  for (const store of targets) {
+    const adminsFile = adminsFileFor(store);
+    let admins = [];
+    if (fs.existsSync(adminsFile)) {
+      try {
+        admins = JSON.parse(fs.readFileSync(adminsFile, 'utf8') || '[]');
+      } catch (e) {
+        admins = [];
+      }
+    }
+
+    const existingIndex = admins.findIndex((a) => a.email === email);
+    const id = existingIndex >= 0 ? admins[existingIndex].id : 'admin-' + Date.now().toString(36);
+    const record = { id, email, name: name || null, passwordHash };
+
+    if (existingIndex >= 0) {
+      admins[existingIndex] = record;
+      console.log(`${store.name} : mot de passe mis à jour pour ${email}.`);
+    } else {
+      admins.push(record);
+      console.log(`${store.name} : compte administrateur créé pour ${email}.`);
+    }
+
+    fs.mkdirSync(path.dirname(adminsFile), { recursive: true });
+    fs.writeFileSync(adminsFile, JSON.stringify(admins, null, 2));
   }
-
-  fs.mkdirSync(path.dirname(ADMINS_FILE), { recursive: true });
-  fs.writeFileSync(ADMINS_FILE, JSON.stringify(admins, null, 2));
-  console.log(`Tu peux maintenant te connecter sur /pages/admin.html avec cet email et ce mot de passe.`);
+  console.log('\nTu peux maintenant te connecter sur /pages/admin.html avec cet email et ce mot de passe.');
 })();

@@ -6,7 +6,7 @@ import 'package:priximport_owendo_mobile/main.dart';
 
 void main() {
   testWidgets('App starts and shows the home screen', (tester) async {
-    await tester.pumpWidget(const PrixImportOwendoApp());
+    await tester.pumpWidget(const PrixImportApp());
     await tester.pump();
 
     expect(find.text('PRIX IMPORT OWENDO'), findsOneWidget);

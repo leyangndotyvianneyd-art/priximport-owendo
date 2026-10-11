@@ -2380,3 +2380,15 @@ footer ul a:hover { color: var(--yellow); }
   .nav-links { gap: 18px; }
   .nav-links > li > a { font-size: 0.9rem; }
 }
+
+/* Atouts du magasin (page Localisation) */
+.store-atouts { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; }
+.store-atout {
+  background: var(--green-dark);
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.store-surface { font-size: 0.9rem; opacity: 0.8; }

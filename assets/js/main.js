@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — main.js =====
+// ===== PRIX IMPORT — main.js =====
 
 function pioCartLink() {
   return (window.DATA_BASE || '') + 'panier.html';

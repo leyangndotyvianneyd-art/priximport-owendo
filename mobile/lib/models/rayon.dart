@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'product.dart';
+import '../config/store_info.dart';
 
 /// Un rayon mis en avant (Cave à vin, Électroménager...) : les produits
 /// d'une catégorie, filtrables par type. Même liste que
@@ -124,8 +125,14 @@ class Rayons {
     types: ['Nourriture', 'Friandises', 'Accessoires', 'Hygiène & soins'],
   );
 
-  /// Rayons qui ont leur écran (la Fraîcheur a le sien, à part).
-  static const all = [
+  /// Rayons de ce magasin (sans la cave s'il n'en a pas — voir
+  /// data/stores.json). La Fraîcheur a son écran, à part.
+  static List<Rayon> get all => [
+        for (final r in _all)
+          if (r != cave || StoreConfig.current.hasCave) r,
+      ];
+
+  static const _all = [
     cave,
     electromenager,
     ustensiles,

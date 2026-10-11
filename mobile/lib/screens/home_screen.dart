@@ -18,6 +18,7 @@ import 'localisation_screen.dart';
 import 'main_shell.dart';
 import 'nouveautes_screen.dart';
 import 'services_screen.dart';
+import '../config/store_info.dart';
 
 /// Accueil façon grande appli de shopping : recherche en tête, raccourcis
 /// vers les rayons, bandeau de confiance, carrousel, vitrine des rayons,
@@ -264,11 +265,11 @@ class _HeaderState extends State<_Header> {
                         width: 34, height: 34),
                   ),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Prix Import',
                           style: TextStyle(
                             fontSize: 18,
@@ -278,8 +279,8 @@ class _HeaderState extends State<_Header> {
                           ),
                         ),
                         Text(
-                          'OWENDO · LIBREVILLE',
-                          style: TextStyle(
+                          '${StoreConfig.current.shortName.toUpperCase()} · LIBREVILLE',
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.4,
@@ -374,8 +375,9 @@ class _Shortcuts extends StatelessWidget {
           () => openShellTab(context, ShellTabs.catalogue)),
       (Icons.eco, AppColors.green, 'Fraîcheur\n& local',
           () => onOpen(const FraicheurScreen())),
-      (Icons.wine_bar, const Color(0xFF8B1E3F), 'Cave\nà vin',
-          () => onOpen(const RayonScreen(rayon: Rayons.cave))),
+      if (StoreConfig.current.hasCave)
+        (Icons.wine_bar, const Color(0xFF8B1E3F), 'Cave\nà vin',
+            () => onOpen(const RayonScreen(rayon: Rayons.cave))),
       (Icons.kitchen, const Color(0xFF1D4ED8), 'Électro-\nménager',
           () => onOpen(const RayonScreen(rayon: Rayons.electromenager))),
       (Icons.soup_kitchen, const Color(0xFFB45309), 'Ustensiles\nde cuisine',
@@ -488,7 +490,7 @@ class _TrustBanner extends StatelessWidget {
       child: Row(
         children: [
           half(Icons.local_shipping_outlined, 'Livraison rapide',
-              'Owendo & Libreville'),
+              '${StoreConfig.current.shortName} & Libreville'),
           Container(
             width: 1,
             height: 30,

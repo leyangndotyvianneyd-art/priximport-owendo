@@ -1,11 +1,14 @@
-// ===== PRIX IMPORT OWENDO — panier-page.js =====
+// ===== PRIX IMPORT — panier-page.js =====
 // Logique propre à la page panier.html : affichage du panier, formulaire, commande.
 
 (function () {
   const container = document.getElementById('cartContent');
   if (!container) return;
 
-  const SHOP_PHONE = '24107413215'; // format international sans le +, pour wa.me
+  // Magasin servi (window.STORE, fourni par le serveur — voir data/stores.json).
+  const STORE = window.STORE || { name: 'Prix Import', shortName: '', orderPrefix: 'PI', contact: {} };
+  const SHOP_WHATSAPP = (STORE.contact && STORE.contact.whatsapp) || ''; // format international sans le +, pour wa.me
+  const SHOP_PHONE = (STORE.contact && STORE.contact.phone) || '';
 
   function formatPrice(n) {
     return n.toLocaleString('fr-FR').replace(/,/g, ' ') + ' FCFA';
@@ -67,7 +70,7 @@
 
             <label for="custMode">Retrait ou livraison ?</label>
             <select id="custMode" name="mode">
-              <option value="retrait">Retrait en magasin (Owendo)</option>
+              <option value="retrait">Retrait en magasin${STORE.shortName ? ` (${STORE.shortName})` : ''}</option>
               <option value="livraison">Livraison à domicile</option>
             </select>
 
@@ -130,7 +133,7 @@
       .catch(() => {
         // Le serveur Node n'est peut-être pas lancé (aperçu statique) : on
         // dégrade proprement avec une référence générée côté client.
-        const fallbackRef = 'PIO-' + Date.now().toString(36).toUpperCase();
+        const fallbackRef = `${STORE.orderPrefix}-` + Date.now().toString(36).toUpperCase();
         showConfirmation(fallbackRef, customer, items);
         window.Cart.clear();
       });
@@ -140,7 +143,7 @@
     const total = typeof serverTotal === 'number' ? serverTotal : items.reduce((s, i) => s + i.qty * i.price, 0);
     const lines = items.map(i => `• ${i.qty} x ${i.name}`).join('\n');
     const message = encodeURIComponent(
-      `Bonjour Prix Import Owendo, je viens de passer la commande ${reference} (${customer.mode}) :\n${lines}\nTotal : ${formatPrice(total)}\nNom : ${customer.name} — Tél : ${customer.phone}${customer.address ? ' — Adresse : ' + customer.address : ''}`
+      `Bonjour ${STORE.name}, je viens de passer la commande ${reference} (${customer.mode}) :\n${lines}\nTotal : ${formatPrice(total)}\nNom : ${customer.name} — Tél : ${customer.phone}${customer.address ? ' — Adresse : ' + customer.address : ''}`
     );
 
     container.innerHTML = `
@@ -149,8 +152,11 @@
         <p>Référence de commande</p>
         <span class="ref">${reference}</span>
         <p>Total : <strong>${formatPrice(total)}</strong></p>
+        ${SHOP_WHATSAPP ? `
         <p style="margin: 18px 0; color: var(--gray);">Confirmez votre commande sur WhatsApp pour que le magasin la prépare tout de suite.</p>
-        <a class="btn btn-whatsapp" href="https://wa.me/${SHOP_PHONE}?text=${message}" target="_blank" rel="noopener">Confirmer sur WhatsApp</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/${SHOP_WHATSAPP}?text=${message}" target="_blank" rel="noopener">Confirmer sur WhatsApp</a>` : `
+        <p style="margin: 18px 0; color: var(--gray);">Appelez le magasin en donnant votre référence pour qu'il prépare votre commande tout de suite.</p>
+        ${SHOP_PHONE ? `<a class="btn btn-primary" href="tel:${SHOP_PHONE.replace(/[^0-9+]/g, '')}">Appeler le ${SHOP_PHONE}</a>` : ''}`}
         <p style="margin-top: 24px;"><a href="pages/catalogue.html">← Continuer mes achats</a></p>
       </div>`;
   }

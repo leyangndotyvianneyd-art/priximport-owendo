@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — products.js =====
+// ===== PRIX IMPORT — products.js =====
 // Charge data/products.json et affiche les produits sur la page catalogue.
 // Sert aussi aux pages "rayon" (ex. Cave à vin) : si la page définit
 // window.PRODUCTS_CATEGORY, seuls les produits de cette catégorie sont

@@ -1,14 +1,17 @@
 {
   "name": "priximport-owendo",
   "version": "1.0.0",
-  "description": "Site vitrine et commande en ligne du supermarché Prix Import Owendo (Libreville, Gabon)",
+  "description": "Sites et applis de commande en ligne des supermarchés Prix Import (Libreville, Gabon) — un seul code pour les 9 magasins",
   "private": true,
   "scripts": {
     "start": "node server.js",
+    "start-all": "node scripts/start-all.js",
     "preview": "live-server --port=5500",
     "create-admin": "node scripts/create-admin.js",
     "remove-test-videos": "node scripts/remove-test-videos.js",
-    "reset-orders": "node scripts/reset-orders.js"
+    "reset-orders": "node scripts/reset-orders.js",
+    "sync-mobile": "node scripts/sync-mobile-stores.js",
+    "set-sheet": "node scripts/set-sheet-url.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

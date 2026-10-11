@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/product.dart';
 import '../models/post.dart';
 import '../models/site_content.dart';
+import '../config/store_info.dart';
 
 /// Adresse du serveur Node (server.js) consommé par l'appli.
 ///
@@ -31,8 +32,11 @@ class ApiConfig {
   static const String publicUrl = String.fromEnvironment('API_URL');
   static bool get isPublicBuild => publicUrl.isNotEmpty;
 
-  static const String defaultBaseUrl =
-      publicUrl != '' ? publicUrl : 'http://192.168.1.72:3000';
+  /// Port du magasin de cette appli (data/stores.json : Owendo 3000,
+  /// Centre Ville 3001...), comme `npm run start-all` côté serveur.
+  static String get defaultBaseUrl => publicUrl != ''
+      ? publicUrl
+      : 'http://192.168.1.69:${StoreConfig.current.port}';
   static const String _prefsKey = 'server_base_url';
 
   static String _baseUrl = defaultBaseUrl;

@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — rayon-page.js =====
+// ===== PRIX IMPORT — rayon-page.js =====
 // Page pages/rayon.html. Avec ?r=<rayon> (ex. ?r=animalerie) : affiche le
 // rayon (titre, couleur) et prépare products.js pour n'afficher que ses
 // produits, filtrables par type. Sans paramètre : liste de tous les rayons
@@ -23,7 +23,7 @@
 
   if (rayon) {
     const name = rayon.shortTitle || rayon.title;
-    document.title = `${name} — PRIX IMPORT OWENDO`;
+    document.title = `${name} — ${(window.STORE ? window.STORE.name : 'Prix Import').toUpperCase()}`;
     document.getElementById('rayonCrumb').textContent = ' / ' + name;
     document.getElementById('rayonEyebrow').textContent = name;
     document.getElementById('rayonTitle').textContent = rayon.title;

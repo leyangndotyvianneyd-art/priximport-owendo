@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — header-slideshow.js =====
+// ===== PRIX IMPORT — header-slideshow.js =====
 // Fait défiler en fondu les photos des produits (data/products.json, promos
 // en premier) en fond de tout le header (logo + recherche + panier, et la
 // ligne des onglets), sous un voile sombre pour que tout reste lisible.

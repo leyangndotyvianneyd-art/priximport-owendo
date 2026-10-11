@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — hero-slider.js =====
+// ===== PRIX IMPORT — hero-slider.js =====
 // Carrousel en haut de la page d'accueil. La 1re diapo (bienvenue) est
 // écrite dans index.html ; ce script ajoute les suivantes à partir de
 // data/products.json et data/posts.json — promotions (ou sélection), rayon
@@ -214,7 +214,7 @@
       theme: 'dark',
       eyebrow: 'Services',
       title: 'Livré chez vous, payé en Mobile Money',
-      text: 'Livraison sur Owendo et Libreville, paiement Airtel Money / Moov Money, ou retrait en magasin.',
+      text: 'Livraison dans tout Libreville, paiement Airtel Money / Moov Money, ou retrait en magasin.',
       href: 'pages/services.html',
       cta: 'Voir les services',
       href2: 'panier.html',

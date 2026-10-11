@@ -1,7 +1,8 @@
 // Repart d'une liste de commandes vide (passage de la démo au réel).
 //
 // Utilisation :
-//   npm run reset-orders
+//   npm run reset-orders                 (Prix Import Owendo)
+//   npm run reset-orders -- golf         (un autre magasin, voir data/stores.json)
 //
 // Les commandes actuelles de data/orders.json ne sont jamais supprimées :
 // elles sont d'abord copiées dans data/orders.backup-<date>.json (fichier
@@ -13,9 +14,11 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const Stores = require('../store');
 
+const STORE = Stores.resolveStoreOrExit(Stores.storeIdFromArgs());
 // Même emplacement que celui lu par server.js (STORAGE_DIR chez un hébergeur).
-const STORAGE_DIR = process.env.STORAGE_DIR ? path.resolve(process.env.STORAGE_DIR) : path.join(__dirname, '..');
+const STORAGE_DIR = Stores.storageDirFor(STORE);
 const DATA_DIR = path.join(STORAGE_DIR, 'data');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 
@@ -35,7 +38,7 @@ if (fs.existsSync(ORDERS_FILE)) {
   }
 }
 
-console.log('=== Remise à zéro des commandes ===\n');
+console.log('=== Remise à zéro des commandes — ' + STORE.name + ' ===\n');
 if (!orders.length) {
   console.log('data/orders.json est déjà vide : rien à faire.');
   process.exit(0);

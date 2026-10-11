@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — home.js =====
+// ===== PRIX IMPORT — home.js =====
 // Page d'accueil, façon appli de shopping, à partir de data/products.json
 // (même source que le catalogue, assets/js/products.js) :
 //  - "Explorez nos rayons" : une carte par catégorie, photo + prix de départ

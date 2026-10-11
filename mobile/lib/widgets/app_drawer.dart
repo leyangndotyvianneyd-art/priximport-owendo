@@ -10,6 +10,7 @@ import '../screens/nouveautes_screen.dart';
 import '../screens/services_screen.dart';
 import '../screens/localisation_screen.dart';
 import '../screens/settings_screen.dart';
+import '../config/store_info.dart';
 
 /// Menu latéral commun à tous les écrans, reprenant la navigation du site
 /// web (Accueil / Catalogue / Fraîcheur / Cave à vin / Nouveautés / Services /
@@ -70,10 +71,10 @@ class AppDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 56, 20, 20),
             color: AppColors.green,
             width: double.infinity,
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'PRIX IMPORT',
                   style: TextStyle(
                     color: AppColors.yellow,
@@ -83,8 +84,8 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'OWENDO',
-                  style: TextStyle(
+                  StoreConfig.current.shortName.toUpperCase(),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

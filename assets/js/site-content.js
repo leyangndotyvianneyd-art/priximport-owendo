@@ -1,4 +1,4 @@
-// ===== PRIX IMPORT OWENDO — site-content.js =====
+// ===== PRIX IMPORT — site-content.js =====
 // Charge data/content.json et remplit tout le contenu éditable depuis
 // l'administration (pages/admin.html, onglet "Contenu du site") : bandeau
 // promo, pied de page, cartes des pages Accueil / Fraîcheur & Local /
@@ -103,6 +103,20 @@ window.PioIcons = window.PioIcons || (function () {
     `).join('');
   }
 
+  // Atouts et superficie du magasin (page Localisation), d'après
+  // window.STORE fourni par le serveur (data/stores.json).
+  (function renderStoreAtouts() {
+    const store = window.STORE;
+    const box = document.getElementById('storeAtouts');
+    if (!box || !store || !Array.isArray(store.features) || !store.features.length) return;
+    document.getElementById('storeAtoutsList').innerHTML = store.features
+      .map((f) => `<span class="store-atout">${escapeHtml(f)}</span>`).join('');
+    if (store.surfaceM2) {
+      fillText('storeSurface', `Surface de vente : ${Number(store.surfaceM2).toLocaleString('fr-FR')} m²`);
+    }
+    box.hidden = false;
+  })();
+
   fetch(base + 'data/content.json')
     .then((res) => (res.ok ? res.json() : Promise.reject()))
     .then((content) => {
@@ -142,6 +156,8 @@ window.PioIcons = window.PioIcons || (function () {
       fillText('contactPhone', contact.phone);
       fillText('contactEmail', contact.email);
       fillHref('contactWhatsapp', contact.whatsapp ? `https://wa.me/${contact.whatsapp}` : null);
+      const waBtn = document.getElementById('contactWhatsapp');
+      if (waBtn) waBtn.hidden = !contact.whatsapp;
     })
     .catch((err) => {
       // Le contenu par défaut déjà présent dans le HTML reste affiché tel
